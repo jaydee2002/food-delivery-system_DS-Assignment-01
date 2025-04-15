@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import { io } from '../index.js';
+import axios from 'axios';
 
 //Place Order
 export const placeOrder = async (req, res) => {
@@ -35,6 +36,10 @@ export const placeOrder = async (req, res) => {
 export const updateOrder = async (req, res) => {
   const { items } = req.body;
   try {
+    const total = items.reduce(
+      (sum, item) => sum + item.quantity * item.price,
+      0
+    );
     const order = await Order.findById(req.params.id);
     if (
       !order ||
@@ -44,7 +49,7 @@ export const updateOrder = async (req, res) => {
       return res.status(403).json({ message: 'Cannot modify order' });
     }
     order.items = items;
-    order.total = items.reduce((sum, item) => sum + item.quantity * 10, 0);
+    order.total = total;
     await order.save();
     res.json(order);
   } catch (err) {
@@ -59,10 +64,13 @@ export const cancelOrder = async (req, res) => {
     if (!order || order.customer.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Unauthorized' });
     }
+
     if (order.status !== 'pending') {
       return res.status(400).json({ message: 'Order cannot be canceled' });
     }
-    await order.remove();
+
+    await Order.findByIdAndDelete(req.params.id);
+
     res.json({ message: 'Order canceled successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -75,7 +83,7 @@ export const getPending = async (req, res) => {
     const orders = await Order.find({
       restaurant: req.params.id,
       status: 'pending',
-    }).populate('customer items.menuItem');
+    });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -85,13 +93,9 @@ export const getPending = async (req, res) => {
 //Change Order Status to Preparing (Restaurant Admin)
 export const acceptOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('restaurant');
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    if (order.restaurant.owner.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: 'Unauthorized: Not the restaurant admin' });
-    }
+
     if (order.status !== 'pending') {
       return res
         .status(400)
@@ -110,6 +114,7 @@ export const acceptOrder = async (req, res) => {
     io.emit('orderStatusUpdate', order);
     res.json({ message: 'Order accepted and set to preparing', order });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -120,7 +125,7 @@ export const getPrepare = async (req, res) => {
     const orders = await Order.find({
       restaurant: req.params.id,
       status: 'preparing',
-    }).populate('customer items.menuItem');
+    });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -130,13 +135,9 @@ export const getPrepare = async (req, res) => {
 //Change Order Status to Ready for Pickup (Restaurant Admin)
 export const prepareOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('restaurant');
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    if (order.restaurant.owner.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: 'Unauthorized: Not the restaurant admin' });
-    }
+
     if (order.status !== 'preparing') {
       return res
         .status(400)
@@ -159,7 +160,7 @@ export const getPickup = async (req, res) => {
     const orders = await Order.find({
       restaurant: req.params.id,
       status: 'ready-to-pickup',
-    }).populate('customer items.menuItem');
+    });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -169,10 +170,47 @@ export const getPickup = async (req, res) => {
 // Get Preparing Orders for Delivery Personnel
 export const getReady = async (req, res) => {
   try {
-    const orders = await Order.find({ status: 'ready-to-pickup' }).populate(
-      'restaurant items.menuItem'
+    const orders = await Order.find({ status: 'ready-to-pickup' });
+
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        // Fetch customer data from User service
+        const customerResponse = await axios.get(
+          `http://localhost:3001/api/user/${order.customer}`
+        );
+        const customer = customerResponse.data;
+
+        // // Fetch restaurant data from Restaurant service
+        // const restaurantResponse = await axios.get(
+        //   `http://restaurant-service:3002/api/restaurants/${order.restaurant}`
+        // );
+        // const restaurant = restaurantResponse.data;
+
+        // // Fetch menu item data for each item
+        // const items = await Promise.all(
+        //   order.items.map(async (item) => {
+        //     const menuItemResponse = await axios.get(
+        //       `http://restaurant-service:3002/api/menu-items/${item.menuItem}`
+        //     );
+        //     return {
+        //       menuItem: menuItemResponse.data,
+        //       quantity: item.quantity,
+        //       price: item.price,
+        //     };
+        //   })
+        // );
+
+        // Return enriched order
+        return {
+          ...order.toObject(),
+          customer,
+          // restaurant,
+          // items,
+        };
+      })
     );
-    res.json(orders);
+
+    res.json(enrichedOrders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -205,8 +243,40 @@ export const getPicked = async (req, res) => {
     const orders = await Order.find({
       restaurant: req.params.id,
       status: 'picked',
-    }).populate('customer items.menuItem');
-    res.json(orders);
+    });
+
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        // Fetch customer data from User service
+        const customerResponse = await axios.get(
+          `http://localhost:3001/api/user/${order.customer}`
+        );
+        const customer = customerResponse.data;
+
+        // Fetch menu item data for each item
+        // const items = await Promise.all(
+        //   order.items.map(async (item) => {
+        //     const menuItemResponse = await axios.get(
+        //       `http://restaurant-service:3002/api/menu-items/${item.menuItem}`
+        //     );
+        //     return {
+        //       menuItem: menuItemResponse.data,
+        //       quantity: item.quantity,
+        //       price: item.price,
+        //     };
+        //   })
+        // );
+
+        // Return enriched order
+        return {
+          ...order.toObject(),
+          customer,
+          // items,
+        };
+      })
+    );
+
+    res.json(enrichedOrders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -239,8 +309,40 @@ export const getDelivered = async (req, res) => {
     const orders = await Order.find({
       restaurant: req.params.id,
       status: 'delivered',
-    }).populate('customer items.menuItem');
-    res.json(orders);
+    });
+
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        // Fetch customer data from User service
+        const customerResponse = await axios.get(
+          `http://localhost:3001/api/user/${order.customer}`
+        );
+        const customer = customerResponse.data;
+
+        // Fetch menu item data for each item
+        // const items = await Promise.all(
+        //   order.items.map(async (item) => {
+        //     const menuItemResponse = await axios.get(
+        //       `http://restaurant-service:3002/api/menu-items/${item.menuItem}`
+        //     );
+        //     return {
+        //       menuItem: menuItemResponse.data,
+        //       quantity: item.quantity,
+        //       price: item.price,
+        //     };
+        //   })
+        // );
+
+        // Return enriched order
+        return {
+          ...order.toObject(),
+          customer,
+          // items,
+        };
+      })
+    );
+
+    res.json(enrichedOrders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -264,23 +366,114 @@ export const trackOrder = async (req, res) => {
 //Customer Past Orders
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ customer: req.user.id })
-      .populate('restaurant')
-      .populate('items.menuItem');
+    const orders = await Order.find({ customer: req.user.id });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+
+  // try {
+  //   const orders = await Order.find({ customer: req.user.id });
+  //   // Enrich orders with restaurant and menu item data
+  //   const enrichedOrders = await Promise.all(
+  //     orders.map(async (order) => {
+  //       // Fetch restaurant data from Restaurant service
+  //       let restaurant;
+  //       try {
+  //         const restaurantResponse = await axios.get(
+  //           `${process.env.RESTAURANT_SERVICE_URL}/api/restaurants/${order.restaurant}`
+  //         );
+  //         restaurant = restaurantResponse.data;
+  //       } catch (err) {
+  //         restaurant = {
+  //           _id: order.restaurant,
+  //           error: 'Restaurant not found or service unavailable',
+  //         };
+  //       }
+
+  //       // Fetch menu item data for each item
+  //       const items = await Promise.all(
+  //         order.items.map(async (item) => {
+  //           try {
+  //             const menuItemResponse = await axios.get(
+  //               `${process.env.RESTAURANT_SERVICE_URL}/api/menu-items/${item.menuItem}`
+  //             );
+  //             return {
+  //               menuItem: menuItemResponse.data,
+  //               quantity: item.quantity,
+  //               price: item.price,
+  //             };
+  //           } catch (err) {
+  //             return {
+  //               menuItem: {
+  //                 _id: item.menuItem,
+  //                 error: 'Menu item not found or service unavailable',
+  //               },
+  //               quantity: item.quantity,
+  //               price: item.price,
+  //             };
+  //           }
+  //         })
+  //       );
+
+  //       // Return enriched order
+  //       return {
+  //         ...order.toObject(),
+  //         restaurant,
+  //         items,
+  //       };
+  //     })
+  //   );
+
+  //   res.json(enrichedOrders);
+  // } catch (err) {
+  //   res.status(500).json({ message: err.message });
+  // }
 };
 
 //Admin Orders
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
-      .populate('customer')
-      .populate('restaurant')
-      .populate('items.menuItem');
-    res.json(orders);
+    const orders = await Order.find();
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        // Fetch customer data from User service
+        const customerResponse = await axios.get(
+          `http://localhost:3001/api/user/${order.customer}`
+        );
+        const customer = customerResponse.data;
+
+        // // Fetch restaurant data from Restaurant service
+        // const restaurantResponse = await axios.get(
+        //   `http://restaurant-service:3002/api/restaurants/${order.restaurant}`
+        // );
+        // const restaurant = restaurantResponse.data;
+
+        // // Fetch menu item data for each item
+        // const items = await Promise.all(
+        //   order.items.map(async (item) => {
+        //     const menuItemResponse = await axios.get(
+        //       `http://restaurant-service:3002/api/menu-items/${item.menuItem}`
+        //     );
+        //     return {
+        //       menuItem: menuItemResponse.data,
+        //       quantity: item.quantity,
+        //       price: item.price,
+        //     };
+        //   })
+        // );
+
+        // Return enriched order
+        return {
+          ...order.toObject(),
+          customer,
+          // restaurant,
+          // items,
+        };
+      })
+    );
+
+    res.json(enrichedOrders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
