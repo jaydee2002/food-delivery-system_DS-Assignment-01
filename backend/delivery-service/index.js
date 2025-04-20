@@ -8,6 +8,7 @@ import deliveryRoutes from './routes/deliveryRoutes.js';
 dotenv.config();
 
 const app = express();
+app.use(express.json()); 
 const server = http.createServer(app);
 export const io = new Server(server);
 mongoose

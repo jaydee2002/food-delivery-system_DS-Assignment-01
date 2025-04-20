@@ -351,9 +351,7 @@ export const getDelivered = async (req, res) => {
 //Track One Specific Order (Customer)
 export const trackOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      'restaurant items.menuItem'
-    );
+    const order = await Order.findById(req.params.id);
     if (!order || order.customer.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Unauthorized' });
     }
