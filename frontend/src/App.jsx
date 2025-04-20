@@ -12,6 +12,10 @@ import DeliveryPersonnelPage from "./pages/deliveryPersonnelPage.jsx";
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
 
+import PaymentPage from "./pages/paymentPage.jsx";
+import PaymentSuccess from "./pages/PaymentSuccess.jsx";
+import PaymentCancel from "./pages/PaymentCancel.jsx";
+
 function App() {
   return (
     <AuthProvider>
@@ -45,6 +49,12 @@ function App() {
                 </RoleProtectedRoute>
               }
             />
+
+            {/* ✅ Payment routes */}
+            <Route path="/pay" element={<PaymentPage />} />
+            <Route path="/success" element={<PaymentSuccess />} />
+            <Route path="/cancel" element={<PaymentCancel />} />
+
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>

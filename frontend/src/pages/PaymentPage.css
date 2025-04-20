@@ -1,0 +1,61 @@
+/* PaymentPage.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #74ebd5, #9face6);
+    min-height: 100vh;
+  }
+  
+  .payment-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 80px;
+  }
+  
+  .payment-container {
+    background-color: #ffffffee;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .payment-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+    text-align: center;
+  }
+  
+  .payment-container form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .payment-container input {
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  
+  .payment-container button {
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  .payment-container button:hover {
+    background-color: #388e3c;
+  }
+  
