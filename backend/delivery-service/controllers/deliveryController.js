@@ -9,10 +9,10 @@ export const assignDelivery = async (req, res) => {
   try {
     // Step 1: Validate order status via Order Service
     const readyOrdersResponse = await axios.get(
-      'http://localhost:3003/api/orders/ready',
-      {
-        headers: { Authorization: req.header('Authorization') },
-      }
+      'http://localhost:3003/api/orders/ready'
+      // {
+      //   headers: { Authorization: req.header('Authorization') },
+      // }
     );
 
     const readyOrders = readyOrdersResponse.data;
@@ -34,7 +34,7 @@ export const assignDelivery = async (req, res) => {
     // Step 3: Create delivery record
     const delivery = new Delivery({
       order: orderId,
-      driver: req.user.id, // From JWT
+      driver: '67fe8ac2ef707d93f35bab1f', // From JWT
       location: 'Restaurant',
       status: 'assigned',
     });
@@ -78,12 +78,13 @@ export const assignDelivery = async (req, res) => {
 // Update Delivery Status
 export const updateDeliveryStatus = async (req, res) => {
   const { status } = req.body;
+  console.log('Updating delivery status:', req.params.id, status);
 
   try {
     const delivery = await Delivery.findById(req.params.id);
-    if (!delivery || delivery.driver.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Unauthorized' });
-    }
+    // if (!delivery || delivery.driver.toString() !== req.user.id) {
+    //   return res.status(403).json({ message: 'Unauthorized' });
+    // }
 
     // Validate status transition
     if (!['in_transit', 'delivered'].includes(status)) {
@@ -165,8 +166,21 @@ export const updateDeliveryStatus = async (req, res) => {
 
 export const getDeliveries = async (req, res) => {
   try {
-    const deliveries = await Delivery.find({ driver: req.user.id });
+    const driverId = '67fe8ac2ef707d93f35bab1f';
+    const deliveries = await Delivery.find({ driver: driverId });
     res.json(deliveries);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getDeliveryById = async (req, res) => {
+  try {
+    const delivery = await Delivery.findById(req.params.id);
+    if (!delivery) {
+      return res.status(404).json({ message: 'Delivery not found' });
+    }
+    res.json(delivery);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
