@@ -12,9 +12,8 @@ import DeliveryPersonnelPage from "./pages/deliveryPersonnelPage.jsx";
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
 
-import PaymentPage from "./pages/paymentPage.jsx";
-import PaymentSuccess from "./pages/PaymentSuccess.jsx";
-import PaymentCancel from "./pages/PaymentCancel.jsx";
+import PaymentPage from "./pages/PaymentPage.jsx";
+import PaymentHistory from "./pages/PaymentHistory.jsx";  // Import PaymentHistory page
 
 function App() {
   return (
@@ -52,8 +51,9 @@ function App() {
 
             {/* ✅ Payment routes */}
             <Route path="/pay" element={<PaymentPage />} />
-            <Route path="/success" element={<PaymentSuccess />} />
-            <Route path="/cancel" element={<PaymentCancel />} />
+
+            {/* ✅ Payment History Route */}
+            <Route path="/payment-history" element={<PaymentHistory />} /> {/* New route for Payment History */}
 
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<PageNotFound />} />

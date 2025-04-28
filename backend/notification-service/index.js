@@ -2,12 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 import notificationRoutes from './routes/notificationRoutes.js';
 import cors from "cors";
+import mongoose from "mongoose";
 
 dotenv.config();
-
-app.use(cors());
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use('/api/notifications', notificationRoutes);
 
@@ -16,6 +16,11 @@ app.use(cors({
   credentials: true,
 }));
 
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error(err));
 
 app.get("/", (req, res) => {
   res.send("Notification Service Running");
@@ -26,7 +31,3 @@ app.listen(PORT, () =>
   console.log(`Notification Service running on port ${PORT}`),
 );
 
-
-
-
-//https://expressjs.com/en/resources/middleware/cors.html
