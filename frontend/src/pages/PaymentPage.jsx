@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import './PaymentPage.css';
+import React, { useState } from "react";
+import "./PaymentPage.css";
 
 const PaymentPage = () => {
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState("");
   const [orderId, setOrderId] = useState(`ORDER_${Date.now()}`);
-  const [userId, setUserId] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [paymentStatus, setPaymentStatus] = useState('');
+  const [userId, setUserId] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const [cartItems, setCartItems] = useState([
-    { item: 'Burger', quantity: 2, price: 200 },
-    { item: 'Pizza', quantity: 1, price: 500 },
+    { item: "Burger", quantity: 2, price: 200 },
+    { item: "Pizza", quantity: 1, price: 500 },
   ]);
 
   const handlePayment = async () => {
@@ -27,22 +27,19 @@ const PaymentPage = () => {
       address: "No.1, Galle Road",
       city: "Colombo",
       country: "Sri Lanka",
-      user_id: userId,  // New field for user ID
-      payment_method: paymentMethod,  // New field for payment method
+      user_id: userId, // New field for user ID
+      payment_method: paymentMethod, // New field for payment method
     };
 
     try {
       // Request backend to generate the hash value
-      const response = await fetch(
-        "http://localhost:5005/payment/start",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(paymentDetails),
-        }
-      );
+      const response = await fetch("http://localhost:5005/payment/start", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentDetails),
+      });
 
       if (response.ok) {
         console.log(response);
@@ -53,8 +50,9 @@ const PaymentPage = () => {
           sandbox: true, // Use sandbox for testing
           merchant_id: merchant_id,
           return_url: "http://localhost:5173/pay",
-          cancel_url: "http://localhost:5173/pay", 
-          notify_url: "https://2204-2402-4000-2260-e928-7862-8cd3-11ba-9289.ngrok-free.app/payment/notify", 
+          cancel_url: "http://localhost:5173/pay",
+          notify_url:
+            "https://2204-2402-4000-2260-e928-7862-8cd3-11ba-9289.ngrok-free.app/payment/notify",
           order_id: paymentDetails.order_id,
           items: "Item Title",
           amount: paymentDetails.amount,
@@ -83,7 +81,7 @@ const PaymentPage = () => {
 
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
-    setPaymentStatus(e.target.value === 'cash' ? 'Pending' : 'Success');
+    setPaymentStatus(e.target.value === "cash" ? "Pending" : "Success");
   };
 
   return (
@@ -134,7 +132,7 @@ const PaymentPage = () => {
                 <input
                   type="radio"
                   value="cash"
-                  checked={paymentMethod === 'cash'}
+                  checked={paymentMethod === "cash"}
                   onChange={handlePaymentMethodChange}
                 />
                 Cash
@@ -143,14 +141,16 @@ const PaymentPage = () => {
                 <input
                   type="radio"
                   value="card"
-                  checked={paymentMethod === 'card'}
+                  checked={paymentMethod === "card"}
                   onChange={handlePaymentMethodChange}
                 />
                 Card
               </label>
             </div>
             <div className="payment-status">
-              <p><strong>Payment Status:</strong> {paymentStatus}</p>
+              <p>
+                <strong>Payment Status:</strong> {paymentStatus}
+              </p>
             </div>
           </div>
 
@@ -180,8 +180,17 @@ const PaymentPage = () => {
               </tr>
             ))}
             <tr>
-              <td colSpan="2"><strong>Total</strong></td>
-              <td><strong>{cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)}</strong></td>
+              <td colSpan="2">
+                <strong>Total</strong>
+              </td>
+              <td>
+                <strong>
+                  {cartItems.reduce(
+                    (acc, item) => acc + item.price * item.quantity,
+                    0
+                  )}
+                </strong>
+              </td>
             </tr>
           </tbody>
         </table>

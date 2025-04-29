@@ -26,14 +26,10 @@ import SalesReport from "./pages/Dashboard/SalesReport.jsx";
 import UserAnalytics from "./pages/Dashboard/UserAnalytics.jsx";
 import Settings from "./pages/Dashboard/Settings.jsx";
 
-import Profile from "./pages/main/Profile.jsx";
+// import Profile from "./pages/main/Profile.jsx";
 
-import LoginForm from "./components/LoginForm.jsx";
-import RegisterForm from "./components/RegisterForm.jsx";
-import CustomerPage from "./pages/customerPage.jsx";
-import RestaurantAdminPage from "./pages/restaurantAdminPage.jsx";
 import SystemAdminPage from "./pages/systemAdminPage.jsx";
-import DeliveryPersonnelPage from "./pages/deliveryPersonnelPage.jsx";
+// import DeliveryPersonnelPage from "./pages/deliveryPersonnelPage.jsx";
 
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
@@ -54,19 +50,18 @@ function App() {
           <Route element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<RegisterForm />} />
+
             <Route path="/ready-deliveries" element={<ReadyDeliveries />} />
             <Route path="/:deliveryId" element={<DeliveryDetails />} />
             <Route path="/deliveries" element={<MyDeliveries />} />
-            <Route
+            {/* <Route
               path="/customer"
               element={
                 <RoleProtectedRoute allowedRoles={["customer"]}>
                   <Profile />
                 </RoleProtectedRoute>
               }
-            />
+            /> */}
           </Route>
 
           {/* Auth layout routes */}
@@ -83,15 +78,14 @@ function App() {
                 </RoleProtectedRoute>
               }
             />
-
-            <Route
+            {/* <Route
               path="/delivery-personnel"
               element={
                 <RoleProtectedRoute allowedRoles={["delivery_personnel"]}>
                   <DeliveryPersonnelPage />
                 </RoleProtectedRoute>
               }
-            />
+            /> */}
             <Route
               path="/system-admin"
               element={
@@ -100,11 +94,9 @@ function App() {
                 </RoleProtectedRoute>
               }
             />
-
             <Route path="/pay" element={<PaymentPage />} />
             <Route path="/payment-history" element={<PaymentHistory />} />{" "}
             {/* New route for Payment History */}
-
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
