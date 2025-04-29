@@ -13,13 +13,19 @@ app.use(cors()); // This allows all origins during development
 app.use(express.json());
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => {
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      retryWrites: true,
+      w: 'majority',
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit the process if MongoDB fails to connect
-  });
+    process.exit(1);
+  }
+};
+connectDB();
 
 // Basic route
 app.get('/', (req, res) => {
