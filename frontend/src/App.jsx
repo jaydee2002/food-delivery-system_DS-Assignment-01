@@ -14,7 +14,7 @@ import Register from "./pages/Auth/Register.jsx";
 import DashboardLayout from "./components/layout/DashboardLayout.js";
 import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import Tickets from "./pages/Dashboard/Tickets.jsx";
-import Agents from "./pages/Dashboard/Agents.jsx";
+import RestaurantApproval from "./pages/Dashboard/RestaurantApproval.jsx";
 import Customers from "./pages/Dashboard/Customers.jsx";
 import AllCustomers from "./pages/Dashboard/AllCustomers.jsx";
 import NewCustomers from "./pages/Dashboard/NewCustomers.jsx";
@@ -113,7 +113,10 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tickets" element={<Tickets />} />
-            <Route path="/agents" element={<Agents />} />
+            <Route
+              path="/restaurant-approval"
+              element={<RestaurantApproval />}
+            />
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/all" element={<AllCustomers />} />
             <Route path="/customers/new" element={<NewCustomers />} />

@@ -75,7 +75,7 @@ const RestaurantSchema = new Schema({
   },
   isAvailable: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   createdAt: {
     type: Date,

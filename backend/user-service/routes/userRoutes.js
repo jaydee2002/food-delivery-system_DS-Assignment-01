@@ -9,4 +9,11 @@ router.get('/profile', verifyAuth, userProfile);
 // Added by Bavi for need in the Order Service
 router.get('/:id', getUserByparam);
 
+router.patch(
+  '/:id/role',
+  verifyAuth,
+  restrictTo('system_admin'),
+  updateUserRole
+);
+
 export default router;
