@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import RestaurantService from "../../services/restaurentServices"; // Import the service
+import { createRestaurant } from "../../services/restaurentServices"; // Import the service
 
 export default function RestaurantSignupForm() {
   // Country data with flags, names and phone codes
@@ -74,7 +74,7 @@ export default function RestaurantSignupForm() {
       };
 
       // Call the service to create a restaurant
-      const result = await RestaurantService.createRestaurant(restaurantData);
+      const result = await createRestaurant(restaurantData);
       console.log("Restaurant created:", result);
       setSubmitSuccess(true);
 

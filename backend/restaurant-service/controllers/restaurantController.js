@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import Restaurant from '../models/Restaurant.js';
-import sanitizeHtml from 'sanitize-html';
-import validator from 'validator';
+
 // Create new restaurant
 export async function createRestaurant(req, res) {
   try {
@@ -38,6 +37,65 @@ export async function getAllRestaurants(req, res) {
     res.status(500).json({
       success: false,
       error: 'An unexpected error occurred',
+    });
+  }
+}
+
+// Get all unavailable restaurants
+export async function getUnavailableRestaurants(req, res) {
+  try {
+    const restaurants = await Restaurant.find({ isAvailable: false }).select(
+      'storeName brandName streetAddress city state zipcode countryCode phoneNumber businessType isAvailable'
+    );
+
+    res.status(200).json({
+      success: true,
+      data: restaurants,
+    });
+  } catch (error) {
+    console.error('Error fetching unavailable restaurants:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch unavailable restaurants',
+    });
+  }
+}
+
+// Update restaurant availability
+export async function updateRestaurantAvailability(req, res) {
+  try {
+    const { id } = req.params;
+    const { isAvailable } = req.body;
+
+    if (typeof isAvailable !== 'boolean') {
+      return res.status(400).json({
+        success: false,
+        error: 'isAvailable must be a boolean value',
+      });
+    }
+
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      id,
+      { isAvailable },
+      { new: true, runValidators: true }
+    );
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: restaurant,
+    });
+  } catch (error) {
+    console.error('Error updating restaurant availability:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update restaurant availability',
     });
   }
 }

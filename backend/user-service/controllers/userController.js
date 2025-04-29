@@ -42,3 +42,36 @@ export const getUserByparam = async (req, res) => {
     });
   }
 };
+
+export const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (
+      ![
+        'customer',
+        'restaurant_admin',
+        'delivery_personnel',
+        'system_admin',
+      ].includes(role)
+    ) {
+      return res.status(400).json({ message: 'Invalid role provided' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'User role updated successfully', user });
+  } catch (err) {
+    console.error(`[SERVER_ERROR] ${err.message}`);
+    res.status(500).json({ message: 'Failed to update user role' });
+  }
+};
