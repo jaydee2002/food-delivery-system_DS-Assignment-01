@@ -41,6 +41,8 @@ import DeliveryDetails from "./pages/delivery-person/components/delivery-details
 import ReadyDeliveries from "./pages/delivery-person/components/delivery-order.jsx";
 import MyDeliveries from "./pages/delivery-person/components/my-delivery.jsx";
 
+import PaymentPage from "./pages/PaymentPage.jsx";
+import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
 // import Sidebar from "./components/dashboard/Sidebar.jsx";
 
 function App() {
@@ -81,6 +83,7 @@ function App() {
                 </RoleProtectedRoute>
               }
             />
+
             <Route
               path="/delivery-personnel"
               element={
@@ -97,6 +100,11 @@ function App() {
                 </RoleProtectedRoute>
               }
             />
+
+            <Route path="/pay" element={<PaymentPage />} />
+            <Route path="/payment-history" element={<PaymentHistory />} />{" "}
+            {/* New route for Payment History */}
+
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
