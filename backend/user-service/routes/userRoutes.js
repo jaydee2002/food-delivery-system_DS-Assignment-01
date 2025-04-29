@@ -1,6 +1,7 @@
 import express from 'express';
-import { verifyAuth } from '../middlewares/authMiddleware.js';
+import { verifyAuth, restrictTo } from '../middlewares/authMiddleware.js';
 import { userProfile, getUserByparam } from '../controllers/userController.js';
+import { updateUserRole } from '../controllers/userController.js';
 
 const router = express.Router();
 
