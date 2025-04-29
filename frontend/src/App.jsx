@@ -56,14 +56,14 @@ function App() {
             <Route path="/:deliveryId" element={<DeliveryDetails />} />
             <Route path="/deliveries" element={<MyDeliveries />} />
 
-            <Route
+            {/* <Route
               path="/restaurant-admin"
               element={
                 <RestaurantAdminPage
                   restaurantId={"64f9d5c0b6e4a3337f96789b"}
                 />
               }
-            />
+            /> */}
             {/* <Route
               path="/customer"
               element={
