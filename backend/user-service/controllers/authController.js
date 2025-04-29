@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import User from '../models/userModel.js';
+import User from '../models/User.js';
 import validator from 'validator';
 
 const generateToken = (id, role) => {

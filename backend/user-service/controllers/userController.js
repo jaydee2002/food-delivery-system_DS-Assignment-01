@@ -1,4 +1,4 @@
-import User from '../models/userModel.js';
+import User from '../models/User.js';
 
 export const userProfile = async (req, res) => {
   try {
@@ -21,7 +21,6 @@ export const userProfile = async (req, res) => {
   }
 };
 
-
 //Added by Bavi for need in the Order Service
 export const getUserByparam = async (req, res) => {
   try {
@@ -42,4 +41,4 @@ export const getUserByparam = async (req, res) => {
       code: 'SERVER_ERROR',
     });
   }
-}
+};
