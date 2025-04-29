@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import "./PaymentPage.css";
+import { useState } from "react";
 
 const PaymentPage = () => {
   const [amount, setAmount] = useState("");
@@ -85,12 +84,19 @@ const PaymentPage = () => {
   };
 
   return (
-    <div className="payment-page-wrapper">
-      <div className="payment-container">
-        <h2>Complete Your Payment</h2>
-        <form className="payment-form">
-          <div className="form-group">
-            <label htmlFor="orderId">Order ID</label>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Complete Your Payment
+        </h2>
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="orderId"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Order ID
+            </label>
             <input
               type="text"
               id="orderId"
@@ -98,11 +104,17 @@ const PaymentPage = () => {
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="amount">Amount (LKR)</label>
+          <div>
+            <label
+              htmlFor="amount"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Amount (LKR)
+            </label>
             <input
               type="number"
               id="amount"
@@ -110,11 +122,17 @@ const PaymentPage = () => {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="userId">User ID</label>
+          <div>
+            <label
+              htmlFor="userId"
+              className="block text-sm font-medium text-gray-700"
+            >
+              User ID
+            </label>
             <input
               type="text"
               id="userId"
@@ -122,78 +140,98 @@ const PaymentPage = () => {
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="payment-method-container">
-            <label htmlFor="paymentMethod">Payment Method</label>
-            <div className="payment-method-options">
-              <label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Payment Method
+            </label>
+            <div className="mt-2 flex space-x-4">
+              <label className="flex items-center">
                 <input
                   type="radio"
                   value="cash"
                   checked={paymentMethod === "cash"}
                   onChange={handlePaymentMethodChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
-                Cash
+                <span className="ml-2 text-sm text-gray-600">Cash</span>
               </label>
-              <label>
+              <label className="flex items-center">
                 <input
                   type="radio"
                   value="card"
                   checked={paymentMethod === "card"}
                   onChange={handlePaymentMethodChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
-                Card
+                <span className="ml-2 text-sm text-gray-600">Card</span>
               </label>
             </div>
-            <div className="payment-status">
-              <p>
-                <strong>Payment Status:</strong> {paymentStatus}
+            <div className="mt-2">
+              <p className="text-sm">
+                <strong>Payment Status:</strong>{" "}
+                <span
+                  className={
+                    paymentStatus === "Success"
+                      ? "text-green-600"
+                      : "text-yellow-600"
+                  }
+                >
+                  {paymentStatus}
+                </span>
               </p>
             </div>
           </div>
 
-          <button type="button" onClick={handlePayment}>
+          <button
+            type="button"
+            onClick={handlePayment}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             Proceed with Payment
           </button>
-        </form>
+        </div>
       </div>
 
       {/* Order Summary Table */}
-      <div className="order-summary">
-        <h3>Order Summary</h3>
-        <table className="order-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Price (LKR)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cartItems.map((item, index) => (
-              <tr key={index}>
-                <td>{item.item}</td>
-                <td>{item.quantity}</td>
-                <td>{item.price}</td>
+      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+          Order Summary
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left text-gray-600">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th className="px-4 py-3">Item</th>
+                <th className="px-4 py-3">Quantity</th>
+                <th className="px-4 py-3">Price (LKR)</th>
               </tr>
-            ))}
-            <tr>
-              <td colSpan="2">
-                <strong>Total</strong>
-              </td>
-              <td>
-                <strong>
+            </thead>
+            <tbody>
+              {cartItems.map((item, index) => (
+                <tr key={index} className="border-b">
+                  <td className="px-4 py-3">{item.item}</td>
+                  <td className="px-4 py-3">{item.quantity}</td>
+                  <td className="px-4 py-3">{item.price}</td>
+                </tr>
+              ))}
+              <tr className="font-semibold">
+                <td colSpan="2" className="px-4 py-3">
+                  Total
+                </td>
+                <td className="px-4 py-3">
                   {cartItems.reduce(
                     (acc, item) => acc + item.price * item.quantity,
                     0
                   )}
-                </strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
