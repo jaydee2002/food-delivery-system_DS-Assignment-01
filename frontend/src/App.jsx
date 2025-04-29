@@ -56,7 +56,14 @@ function App() {
             <Route path="/:deliveryId" element={<DeliveryDetails />} />
             <Route path="/deliveries" element={<MyDeliveries />} />
 
-            <Route path="/restaurant-admin" element={<RestaurantAdminPage restaurantId={"64f9d5c0b6e4a3337f96789b"} />} />
+            <Route
+              path="/restaurant-admin"
+              element={
+                <RestaurantAdminPage
+                  restaurantId={"64f9d5c0b6e4a3337f96789b"}
+                />
+              }
+            />
             {/* <Route
               path="/customer"
               element={
@@ -111,6 +118,14 @@ function App() {
             <Route
               path="/restaurant-approval"
               element={<RestaurantApproval />}
+            />
+            <Route
+              path="/restaurant-admin"
+              element={
+                <RestaurantAdminPage
+                  restaurantId={"64f9d5c0b6e4a3337f96789b"}
+                />
+              }
             />
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/all" element={<AllCustomers />} />
