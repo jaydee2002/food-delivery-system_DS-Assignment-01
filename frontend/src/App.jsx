@@ -25,6 +25,7 @@ import Analytics from "./pages/Dashboard/Analytics.jsx";
 import SalesReport from "./pages/Dashboard/SalesReport.jsx";
 import UserAnalytics from "./pages/Dashboard/UserAnalytics.jsx";
 import Settings from "./pages/Dashboard/Settings.jsx";
+import RestaurantAdminPage from "./pages/restaurantAdminPage.jsx";
 
 // import Profile from "./pages/main/Profile.jsx";
 
@@ -54,6 +55,8 @@ function App() {
             <Route path="/ready-deliveries" element={<ReadyDeliveries />} />
             <Route path="/:deliveryId" element={<DeliveryDetails />} />
             <Route path="/deliveries" element={<MyDeliveries />} />
+
+            <Route path="/restaurant-admin" element={<RestaurantAdminPage restaurantId={"64f9d5c0b6e4a3337f96789b"} />} />
             {/* <Route
               path="/customer"
               element={
