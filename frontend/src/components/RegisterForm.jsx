@@ -13,6 +13,7 @@ function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false); // Fixed typo
   const [showPassword, setShowPassword] = useState(false);
@@ -46,6 +47,12 @@ function RegisterForm() {
             ? ""
             : "Passwords do not match.";
         break;
+        case "role":
+        newErrors.role =
+          value === "customer" || value === "system_admin" || value === "restaurant_admin" || value === "delivery_personnel"
+            ? ""
+            : "Please select a valid role.";
+        break;
       default:
         break;
     }
@@ -58,12 +65,14 @@ function RegisterForm() {
     validateField("email", email);
     validateField("password", password);
     validateField("confirmPassword", confirmPassword);
+    validateField("role", role);
     return (
       Object.values(errors).every((error) => error === "") &&
       name.trim() !== "" &&
       email.trim() !== "" &&
       password.trim() !== "" &&
-      confirmPassword.trim() !== ""
+      confirmPassword.trim() !== "" &&
+      role.trim() !== ""
     );
   };
 
@@ -71,15 +80,16 @@ function RegisterForm() {
     setLoading(true); // Fixed typo
 
     try {
-      const registerResponse = await registerUser({ name, email, password });
+      const registerResponse = await registerUser({ name, email, password, role });
       if (registerResponse.success) {
         alert(registerResponse.message);
         setName("");
         setEmail("");
         setPassword("");
         setConfirmPassword("");
+        setRole("");
 
-        console.log(name, email, password, confirmPassword);
+        console.log(name, email, password, confirmPassword, role);
 
         const signInConfirmed = window.confirm("Do you want to sign in now?");
         if (signInConfirmed) {
@@ -124,6 +134,7 @@ function RegisterForm() {
         email: "input[name='email']",
         password: "input[name='password']",
         confirmPassword: "input[name='confirmPassword']",
+        role: "select[name='role']",
       };
       if (firstErrorField) {
         const input = document.querySelector(fieldMap[firstErrorField]);
@@ -268,6 +279,55 @@ function RegisterForm() {
                     <div className="text-red-500 text-sm mt-1">
                       {errors.email}
                     </div>
+                  )}
+                </div>
+              </div>
+              <div className="bg-white rounded-lg max-w-md mx-auto py-2">
+                <div className="relative bg-inherit">
+                  <select
+                    id="role"
+                    value={role}
+                    onChange={(e) => {
+                      setRole(e.target.value);
+                      validateField(e.target.name, e.target.value);
+                    }}
+                    name="role"
+                    className="peer bg-transparent h-12 w-full rounded-lg text-gray-900 ring-2 ring-gray-300 px-4 focus:ring-sky-500 focus:outline-none focus:border-sky-600 transition-all appearance-none"
+                    required
+                  >
+                    <option value="" disabled>
+                      Select your role
+                    </option>
+                    <option value="customer">Customer</option>
+                    <option value="system_admin">System Admin</option>
+                    <option value="restaurant_admin">Restaurant Admin</option>
+                    <option value="delivery_personnel">Delivery Personnel</option>
+                  </select>
+                  <label
+                    htmlFor="role"
+                    className="absolute cursor-text left-4 -top-3 text-sm text-gray-600 bg-white px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-3 peer-focus:text-sky-600 peer-focus:text-sm transition-all"
+                  >
+                    Role
+                  </label>
+                  {/* Custom dropdown arrow */}
+                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                  {errors.role && (
+                    <div className="text-red-500 text-sm mt-1">{errors.role}</div>
                   )}
                 </div>
               </div>

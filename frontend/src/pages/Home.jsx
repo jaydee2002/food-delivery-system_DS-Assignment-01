@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 const Home = () => {
-  const { isAuthenticated, userRole } = useAuth(); // Destructure values from context
+  const { isAuthenticated, userRole } = useAuth();
 
   return (
     <>

@@ -85,6 +85,13 @@ export default function Navbar() {
           >
             Restaurant admin
           </a>
+          <a
+            href="#"
+            className="text-gray-700 hover:text-gray-900 transition-transform duration-300 hover:scale-105"
+            onClick={() => navigate("/system-admin")} // Navigate directly to home
+          >
+            System Admin
+                     </a>
           {isAuthenticated ? (
             <button
               onClick={handleLogout}
