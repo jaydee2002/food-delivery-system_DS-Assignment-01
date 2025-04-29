@@ -19,87 +19,137 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
-    console.log(token);
+    // Remove console.log in production
+    // console.log(token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-const RestaurantService = {
-  // Create a new restaurant
-  createRestaurant: async (restaurantData) => {
-    try {
-      const response = await axiosInstance.post("/", restaurantData);
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error creating restaurant:",
-        error.response?.data || error.message
-      );
-      throw error.response?.data?.error || "Failed to create restaurant";
+// Create a new restaurant
+export const createRestaurant = async (restaurantData) => {
+  try {
+    if (!restaurantData || typeof restaurantData !== "object") {
+      throw new Error("Invalid restaurant data");
     }
-  },
-
-  // Get all restaurants
-  getAllRestaurants: async () => {
-    try {
-      const response = await axiosInstance.get("/");
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error fetching restaurants:",
-        error.response?.data || error.message
-      );
-      throw error.response?.data?.error || "Failed to fetch restaurants";
-    }
-  },
-
-  // Get restaurant by ID
-  getRestaurantById: async (id) => {
-    try {
-      const response = await axiosInstance.get(`/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error fetching restaurant details:",
-        error.response?.data || error.message
-      );
-      throw error.response?.data?.error || "Failed to fetch restaurant details";
-    }
-  },
-
-  // Update restaurant
-  updateRestaurant: async (id, updatedData) => {
-    try {
-      const response = await axiosInstance.put(`/${id}`, updatedData);
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error updating restaurant:",
-        error.response?.data || error.message
-      );
-      throw error.response?.data?.error || "Failed to update restaurant";
-    }
-  },
-
-  // Delete restaurant
-  deleteRestaurant: async (id) => {
-    try {
-      const response = await axiosInstance.delete(`/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error deleting restaurant:",
-        error.response?.data || error.message
-      );
-      throw error.response?.data?.error || "Failed to delete restaurant";
-    }
-  },
+    const response = await axiosInstance.post("/", restaurantData);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error creating restaurant:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data?.error || "Failed to create restaurant";
+  }
 };
 
-export default RestaurantService;
+// Get unavailable restaurants
+export const getUnavailableRestaurants = async () => {
+  try {
+    const response = await axiosInstance.get("/unavailable");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching unavailable restaurants:",
+      error.response?.data || error.message
+    );
+    throw (
+      error.response?.data?.error || "Failed to fetch unavailable restaurants"
+    );
+  }
+};
+
+// Update restaurant availability
+export const updateRestaurantAvailability = async (restaurantId) => {
+  try {
+    if (!restaurantId) {
+      throw new Error("Restaurant ID is required");
+    }
+    const response = await axiosInstance.patch(
+      `/${restaurantId}/availability`,
+      {
+        isAvailable: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating restaurant availability:",
+      error.response?.data || error.message
+    );
+    throw (
+      error.response?.data?.error || "Failed to update restaurant availability"
+    );
+  }
+};
+
+// Get all restaurants
+export const getAllRestaurants = async () => {
+  try {
+    const response = await axiosInstance.get("/");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching restaurants:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data?.error || "Failed to fetch restaurants";
+  }
+};
+
+// Get restaurant by ID
+export const getRestaurantById = async (id) => {
+  try {
+    if (!id) {
+      throw new Error("Restaurant ID is required");
+    }
+    const response = await axiosInstance.get(`/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching restaurant details:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data?.error || "Failed to fetch restaurant details";
+  }
+};
+
+// Update restaurant
+export const updateRestaurant = async (id, updatedData) => {
+  try {
+    if (!id) {
+      throw new Error("Restaurant ID is required");
+    }
+    if (!updatedData || typeof updatedData !== "object") {
+      throw new Error("Invalid update data");
+    }
+    const response = await axiosInstance.put(`/${id}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating restaurant:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data?.error || "Failed to update restaurant";
+  }
+};
+
+// Delete restaurant
+export const deleteRestaurant = async (id) => {
+  try {
+    if (!id) {
+      throw new Error("Restaurant ID is required");
+    }
+    const response = await axiosInstance.delete(`/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error deleting restaurant:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data?.error || "Failed to delete restaurant";
+  }
+};
