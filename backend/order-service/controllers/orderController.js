@@ -175,10 +175,10 @@ export const getReady = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        // const customerResponse = await axios.get(
+        //   `http://localhost:3001/api/user/${order.customer}`
+        // );
+        // const customer = customerResponse.data;
 
         // // Fetch restaurant data from Restaurant service
         // const restaurantResponse = await axios.get(
@@ -203,7 +203,7 @@ export const getReady = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          // customer,
           // restaurant,
           // items,
         };
@@ -248,10 +248,10 @@ export const getPicked = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        // const customerResponse = await axios.get(
+        //   `http://localhost:3001/api/user/${order.customer}`
+        // );
+        // const customer = customerResponse.data;
 
         // Fetch menu item data for each item
         // const items = await Promise.all(
@@ -270,7 +270,7 @@ export const getPicked = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          // customer,
           // items,
         };
       })
@@ -314,10 +314,10 @@ export const getDelivered = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        // const customerResponse = await axios.get(
+        //   `http://localhost:3001/api/user/${order.customer}`
+        // );
+        // const customer = customerResponse.data;
 
         // Fetch menu item data for each item
         // const items = await Promise.all(
@@ -336,7 +336,7 @@ export const getDelivered = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          // customer,
           // items,
         };
       })
@@ -351,12 +351,10 @@ export const getDelivered = async (req, res) => {
 //Track One Specific Order (Customer)
 export const trackOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      'restaurant items.menuItem'
-    );
-    if (!order || order.customer.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Unauthorized' });
-    }
+    const order = await Order.findById(req.params.id);
+    // if (!order || order.customer.toString() !== req.user.id) {
+    //   return res.status(403).json({ message: 'Unauthorized' });
+    // }
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });

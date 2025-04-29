@@ -4,7 +4,7 @@ import { AuthProvider } from "./contexts/authContext";
 import RoleProtectedRoute from "./routes/RoleProtectedRoute.jsx";
 
 import MainLayout from "./components/layout/MainLayout.js";
-import Home from "./pages/main/Home.jsx";
+import Home from "./pages/main/Home.jsx"; // Keep only this Home
 import RestaurantSignupForm from "./pages/Auth/RestaurantSignupForm.jsx";
 
 import AuthLayout from "./components/layout/AuthLayout.jsx";
@@ -28,8 +28,18 @@ import Settings from "./pages/Dashboard/Settings.jsx";
 
 import Profile from "./pages/main/Profile.jsx";
 
+import LoginForm from "./components/LoginForm.jsx";
+import RegisterForm from "./components/RegisterForm.jsx";
+import CustomerPage from "./pages/customerPage.jsx";
+import RestaurantAdminPage from "./pages/restaurantAdminPage.jsx";
+import SystemAdminPage from "./pages/systemAdminPage.jsx";
+import DeliveryPersonnelPage from "./pages/deliveryPersonnelPage.jsx";
+
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
+import DeliveryDetails from "./pages/delivery-person/components/delivery-details.jsx";
+import ReadyDeliveries from "./pages/delivery-person/components/delivery-order.jsx";
+import MyDeliveries from "./pages/delivery-person/components/my-delivery.jsx";
 
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
@@ -40,10 +50,15 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Main layout routes */}
           <Route element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="/" element={<Home />} />
-
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/ready-deliveries" element={<ReadyDeliveries />} />
+            <Route path="/:deliveryId" element={<DeliveryDetails />} />
+            <Route path="/deliveries" element={<MyDeliveries />} />
             <Route
               path="/customer"
               element={
@@ -53,6 +68,8 @@ function App() {
               }
             />
           </Route>
+
+          {/* Auth layout routes */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -60,19 +77,39 @@ function App() {
               path="/restaurant-register"
               element={
                 <RoleProtectedRoute
-                  allowedRoles={(["customer"], ["restaurant_admin"])}
+                  allowedRoles={["customer", "restaurant_admin"]}
                 >
                   <RestaurantSignupForm />
                 </RoleProtectedRoute>
               }
             />
+
+            <Route
+              path="/delivery-personnel"
+              element={
+                <RoleProtectedRoute allowedRoles={["delivery_personnel"]}>
+                  <DeliveryPersonnelPage />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/system-admin"
+              element={
+                <RoleProtectedRoute allowedRoles={["system_admin"]}>
+                  <SystemAdminPage />
+                </RoleProtectedRoute>
+              }
+            />
+
             <Route path="/pay" element={<PaymentPage />} />
             <Route path="/payment-history" element={<PaymentHistory />} />{" "}
             {/* New route for Payment History */}
+
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
 
+          {/* Dashboard layout routes */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tickets" element={<Tickets />} />
@@ -89,6 +126,7 @@ function App() {
             <Route path="/settings" element={<Settings />} />
           </Route>
 
+          {/* Catch all */}
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
