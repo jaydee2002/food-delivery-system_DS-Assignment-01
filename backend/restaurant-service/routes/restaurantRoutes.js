@@ -7,13 +7,19 @@ import {
   getRestaurantById,
   updateRestaurant,
   deleteRestaurant,
+  getMenuItemsByRestaurant,
 } from '../controllers/restaurantController.js';
 import { verifyAuth, restrictTo } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 // Restaurant routes
-router.post('/', verifyAuth, restrictTo('restaurant_admin'), createRestaurant);
+router.post(
+  '/',
+  verifyAuth,
+  restrictTo('customer', 'restaurant_admin'),
+  createRestaurant
+);
 
 router.get(
   '/unavailable',
@@ -21,12 +27,16 @@ router.get(
   restrictTo('system_admin'),
   getUnavailableRestaurants
 );
+
 router.patch(
   '/:id/availability',
   verifyAuth,
   restrictTo('system_admin'),
   updateRestaurantAvailability
 );
+
+// Fetch menu items for a specific restaurant
+router.get('/menu', getMenuItemsByRestaurant);
 
 router.get('/', getAllRestaurants);
 router.get('/:id', getRestaurantById);

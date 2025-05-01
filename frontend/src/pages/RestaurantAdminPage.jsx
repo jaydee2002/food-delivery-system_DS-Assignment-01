@@ -105,7 +105,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="bg-gray-100 p-3 rounded-lg">
             <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
               Customer
             </h4>
@@ -236,7 +236,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
                   {group.orders.map(renderOrder)}
                 </ul>
               ) : (
-                <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+                <div className="bg-white rounded-xl border p-8 text-center">
                   <svg
                     className="mx-auto h-12 w-12 text-gray-400"
                     fill="none"

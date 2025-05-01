@@ -1,36 +1,155 @@
 import Order from '../models/Order.js';
 import { io } from '../index.js';
 import axios from 'axios';
+import Stripe from 'stripe';
 
-//Place Order
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-04-10',
+});
+
 export const placeOrder = async (req, res) => {
-  const { restaurantId, items } = req.body;
   try {
+    const { restaurantId, items, address, paymentMethod, paymentIntent } =
+      req.body;
+    const userId = req.user._id; // From auth middleware
+
+    // Validate request
+    if (
+      !restaurantId ||
+      !items ||
+      !items.length ||
+      !address ||
+      !paymentMethod
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID, items, address, and payment method are required',
+      });
+    }
+
+    console.log(process.env.RESTAURANT_SERVICE_URL);
+
+    // Validate restaurant via Restaurant Service
+    const restaurantResponse = await axios.get(
+      `${process.env.RESTAURANT_SERVICE_URL}/restaurants/${restaurantId}`
+    );
+
+    const restaurant = restaurantResponse.data.data;
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    console.log('Fine so far');
+
+    // Validate menu items
+    for (const item of items) {
+      const menuItemResponse = await axios.get(
+        `${process.env.RESTAURANT_SERVICE_URL}/menu?menuItemId=${item.menuItem}`,
+        {
+          headers: { Authorization: req.headers.authorization },
+        }
+      );
+      console.log('Menu item response:', menuItemResponse.data);
+      const menuItem = menuItemResponse.data.data[0];
+      if (!menuItem || menuItem.restaurant.toString() !== restaurantId) {
+        return res.status(400).json({
+          success: false,
+          error: `Menu item ${item.menuItem} is invalid or does not belong to the restaurant`,
+        });
+      }
+      if (item.price !== menuItem.price) {
+        return res.status(400).json({
+          success: false,
+          error: `Price mismatch for menu item ${item.menuItem}`,
+        });
+      }
+    }
+
+    // Calculate total
     const total = items.reduce(
-      (sum, item) => sum + item.quantity * item.price,
+      (sum, item) => sum + item.price * item.quantity,
       0
     );
+
+    // Create order
     const order = new Order({
-      customer: req.user.id,
+      customer: userId,
       restaurant: restaurantId,
       items,
+      address,
+      paymentMethod,
       total,
+      paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending',
     });
+
     await order.save();
 
-    // const paymentResponse = await axios.post(
-    //   'http://localhost:3000/api/payments/process',
-    //   { orderId: order._id, amount: total },
-    //   { headers: { Authorization: `Bearer ${req.header('Authorization')}` } }
-    // );
+    if (paymentMethod === 'online' && paymentIntent) {
+      // Create Stripe Payment Intent
+      const paymentIntent = await stripeClient.paymentIntents.create({
+        amount: Math.round(total * 100), // Convert to cents
+        currency: 'usd',
+        metadata: { orderId: order._id.toString() },
+      });
 
-    io.emit('newOrder', order);
-    res.status(201).json(order);
+      return res.status(200).json({
+        success: true,
+        data: {
+          clientSecret: paymentIntent.client_secret,
+          order,
+        },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: order,
+    });
   } catch (error) {
-    console.log('eoorr', error);
-    res.status(500).json({ message: 'Error in Placing Order' });
+    console.error('Error creating order:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create order',
+    });
   }
 };
+
+// //Place Order
+// export const placeOrder = async (req, res) => {
+//   const { restaurantId, items } = req.body;
+//   try {
+//     const total = items.reduce(
+//       (sum, item) => sum + item.quantity * item.price,
+//       0
+//     );
+//     const order = new Order({
+//       customer: req.user.id,
+//       restaurant: restaurantId,
+//       items,
+//       total,
+//     });
+//     await order.save();
+
+//     // const paymentResponse = await axios.post(
+//     //   'http://localhost:3000/api/payments/process',
+//     //   { orderId: order._id, amount: total },
+//     //   { headers: { Authorization: `Bearer ${req.header('Authorization')}` } }
+//     // );
+
+//     io.emit('newOrder', order);
+//     res.status(201).json(order);
+//   } catch (error) {
+//     console.log('eoorr', error);
+//     res.status(500).json({ message: 'Error in Placing Order' });
+//   }
+// };
 
 //Before Confirmation Update Order
 export const updateOrder = async (req, res) => {

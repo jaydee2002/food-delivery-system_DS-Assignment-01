@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Restaurant from '../models/Restaurant.js';
+import MenuItem from '../models/MenuItem.js';
 
 // Create new restaurant
 export async function createRestaurant(req, res) {
@@ -19,24 +20,6 @@ export async function createRestaurant(req, res) {
     res.status(500).json({
       success: false,
       error: 'Failed to create restaurant',
-    });
-  }
-}
-
-// Get all restaurants
-export async function getAllRestaurants(req, res) {
-  try {
-    const restaurants = await Restaurant.find().populate('owner', 'name email');
-
-    res.status(200).json({
-      success: true,
-      count: restaurants.length,
-      data: restaurants,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'An unexpected error occurred',
     });
   }
 }
@@ -100,8 +83,27 @@ export async function updateRestaurantAvailability(req, res) {
   }
 }
 
+// Get all restaurants
+export async function getAllRestaurants(req, res) {
+  try {
+    const restaurants = await Restaurant.find().populate('owner', 'name email');
+
+    res.status(200).json({
+      success: true,
+      count: restaurants.length,
+      data: restaurants,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'An unexpected error occurred',
+    });
+  }
+}
+
 // Get single restaurant by ID
 export async function getRestaurantById(req, res) {
+  console.log('i am in getRestaurantById');
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
@@ -225,3 +227,42 @@ export async function deleteRestaurant(req, res) {
     });
   }
 }
+
+export const getMenuItemsByRestaurant = async (req, res) => {
+  try {
+    const { restaurantId } = req.query;
+
+    if (!restaurantId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID is required',
+      });
+    }
+
+    // Validate restaurant existence
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    // Fetch menu items for the restaurant
+    const menuItems = await MenuItem.find({
+      restaurant: restaurantId,
+      isAvailable: true,
+    }).select('_id name description price category image isAvailable');
+
+    res.status(200).json({
+      success: true,
+      data: menuItems,
+    });
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch menu items',
+    });
+  }
+};

@@ -88,6 +88,7 @@ import {
   cancelOrder,
 } from '../controllers/orderController.js';
 import {
+  verifyAuth,
   customerAuthMiddleware,
   restaurantAdminAuthMiddleware,
   systemAdminAuthMiddleware,
@@ -104,7 +105,7 @@ router.get('/ready', getReady);
 router.patch('/:id/deliver', deliverOrder);
 
 //Customer
-router.post('/', placeOrder);
+router.post('/', verifyAuth, placeOrder);
 router.patch('/:id', updateOrder);
 router.get('/:id', trackOrder);
 router.get('/', getOrders);

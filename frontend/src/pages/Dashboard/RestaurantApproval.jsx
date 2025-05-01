@@ -128,7 +128,7 @@ const RestaurantApproval = () => {
               restaurants.map((restaurant) => (
                 <div
                   key={restaurant._id}
-                  className="bg-white rounded-lg p-6  transition-all duration-300"
+                  className="bg-white border rounded-lg p-6  transition-all duration-300"
                 >
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">
                     {restaurant.storeName || "N/A"}

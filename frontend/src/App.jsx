@@ -26,6 +26,7 @@ import SalesReport from "./pages/Dashboard/SalesReport.jsx";
 import UserAnalytics from "./pages/Dashboard/UserAnalytics.jsx";
 import Settings from "./pages/Dashboard/Settings.jsx";
 import RestaurantAdminPage from "./pages/restaurantAdminPage.jsx";
+import MenuManagement from "./pages/Dashboard/MenuManagement.jsx";
 
 // import Profile from "./pages/main/Profile.jsx";
 
@@ -41,6 +42,13 @@ import MyDeliveries from "./pages/delivery-person/components/my-delivery.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
 // import Sidebar from "./components/dashboard/Sidebar.jsx";
+
+import Layout from "./components/Layout";
+import HomePage from "./components/HomePage";
+import RestaurantPage from "./components/RestaurantPage";
+import CartPage from "./components/CartPage";
+import CheckoutPage from "./components/CheckoutPage";
+import DemPaymentPage from "./components/PaymentPage";
 
 function App() {
   return (
@@ -72,6 +80,14 @@ function App() {
                 </RoleProtectedRoute>
               }
             /> */}
+          </Route>
+
+          <Route path="/" element={<Layout />}>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/restaurant/:id" element={<RestaurantPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/payment" element={<DemPaymentPage />} />
           </Route>
 
           {/* Auth layout routes */}
@@ -114,6 +130,7 @@ function App() {
           {/* Dashboard layout routes */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/menu-management" element={<MenuManagement />} />
             <Route path="/tickets" element={<Tickets />} />
             <Route
               path="/restaurant-approval"

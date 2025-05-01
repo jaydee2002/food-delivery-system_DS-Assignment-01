@@ -29,6 +29,31 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const getRestaurants = async () => {
+  try {
+    const response = await axiosInstance.get("/");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Failed to fetch restaurants"
+    );
+  }
+};
+
+export const getMenuItemsByRestaurant = async (restaurantId) => {
+  try {
+    console.log(restaurantId);
+    const response = await axiosInstance.get(
+      `/menu?restaurantId=${restaurantId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Failed to fetch menu items"
+    );
+  }
+};
+
 // Create a new restaurant
 export const createRestaurant = async (restaurantData) => {
   try {
