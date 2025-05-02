@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getRestaurants } from "../services/restaurentServices";
 
-function HomePage() {
+function Restaurants() {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -80,4 +80,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default Restaurants;

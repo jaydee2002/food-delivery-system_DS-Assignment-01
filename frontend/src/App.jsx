@@ -2,6 +2,7 @@ import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/authContext";
 import RoleProtectedRoute from "./routes/RoleProtectedRoute.jsx";
+import RedirectByRole from "./routes/RedirectByRole";
 
 import MainLayout from "./components/layout/MainLayout.js";
 import Home from "./pages/main/Home.jsx"; // Keep only this Home
@@ -48,7 +49,7 @@ import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistor
 // import Sidebar from "./components/dashboard/Sidebar.jsx";
 
 import Layout from "./components/Layout";
-import HomePage from "./components/HomePage";
+import Restaurants from "./components/Restaurants.jsx";
 import RestaurantPage from "./components/RestaurantPage";
 import CartPage from "./components/CartPage";
 import CheckoutPage from "./components/CheckoutPage";
@@ -76,7 +77,7 @@ function App() {
                 />
               }
             >
-              <Route path="/home" element={<HomePage />} />
+              <Route path="/restaurants" element={<Restaurants />} />
               <Route path="/add-restaurent" element={<AddRestaurant />} />
               <Route path="/restaurant/:id" element={<RestaurantPage />} />
               <Route path="/cart" element={<CartPage />} />
@@ -90,22 +91,21 @@ function App() {
             <Route
               element={<RoleProtectedRoute allowedRoles={["system_admin"]} />}
             >
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/system-admin" element={<SystemAdminPage />} />
+              <Route
+                path="/restaurant-approval"
+                element={<RestaurantApproval />}
+              />
             </Route>
           </Route>
 
           <Route element={<RestaurantAdminDashboardLayout />}>
             <Route
               element={
-                <RoleProtectedRoute allowedRoles={["restaurant-admin"]} />
+                <RoleProtectedRoute allowedRoles={["restaurant_admin"]} />
               }
             >
-              <Route path="/restaurant/:id" element={<RestaurantPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/payment" element={<DemPaymentPage />} />
-              <Route path="/pay" element={<PaymentPage />} />
+              <Route path="/menu-management" element={<MenuManagement />} />
             </Route>
           </Route>
 
@@ -123,7 +123,7 @@ function App() {
           </Route>
 
           {/* Role-based redirection */}
-          {/* <Route path="/dashboard" element={<RedirectByRole />} /> */}
+          <Route path="/dashboard" element={<RedirectByRole />} />
 
           {/* Catch all */}
           <Route path="/unauthorized" element={<Unauthorized />} />

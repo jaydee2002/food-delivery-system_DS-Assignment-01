@@ -14,17 +14,29 @@ const Home = () => {
       </p>
 
       {isAuthenticated ? (
-        <>
-          <p className="text-gray-600 mb-4">
-            Hello, {userRole}! Ready to order?
-          </p>
-          <Link
-            to="/restaurants"
-            className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
-          >
-            Browse Restaurants
-          </Link>
-        </>
+        userRole === "customer" ? (
+          <>
+            <p className="text-gray-600 mb-4">
+              Hello, {userRole}! Ready to order?
+            </p>
+            <Link
+              to="/restaurants"
+              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
+            >
+              Browse Restaurants
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-600 mb-4">Hello, {userRole}!</p>
+            <Link
+              to="/dashboard"
+              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
+            >
+              Go to Dashboard
+            </Link>
+          </>
+        )
       ) : (
         <p className="text-gray-600">
           Please{" "}
