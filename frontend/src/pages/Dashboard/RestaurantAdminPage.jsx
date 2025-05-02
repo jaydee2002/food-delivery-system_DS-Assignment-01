@@ -9,6 +9,10 @@ import {
   prepareOrder,
   acceptOrder,
 } from "../services/api/orderLists.js";
+import { getRestaurantById, getMenuItemsByRestaurant} from "../services/restaurentServices.js";
+import { getUserById } from "../services/userServices.js";
+
+
 
 const RestaurantAdminPage = ({ restaurantId }) => {
   const [orderGroups, setOrderGroups] = useState({
@@ -18,21 +22,49 @@ const RestaurantAdminPage = ({ restaurantId }) => {
     picked: [],
     delivered: [],
   });
-
+  const [restaurant, setRestaurant] = useState(null);
+  const [user, setUser] = useState({});
+  const [menuItems, setMenuItems] = useState([]);
   useEffect(() => {
     fetchAllOrders();
   }, [restaurantId]);
 
   const fetchAllOrders = async () => {
     try {
-      const [pending, preparing, ready, picked, delivered] = await Promise.all([
+      const [pending, preparing, ready, picked, delivered, restaurantData, menuData] = await Promise.all([
         getPendingOrders(restaurantId),
         getPrepare(restaurantId),
         getPickup(restaurantId),
         getPicked(restaurantId),
         getDelivered(restaurantId),
+        getRestaurantById(restaurantId),
+        getMenuItemsByRestaurant(restaurantId),
+        
       ]);
 
+
+      const allOrders = [...pending, ...preparing, ...ready, ...picked, ...delivered];
+      const uniqueCustomerIds = [
+        ...new Set(allOrders.map((order) => order.customer).filter((id) => id)),
+      ];
+
+      // Fetch user data for all unique customer IDs
+      const userPromises = uniqueCustomerIds.map((customerId) =>
+        getUserById(customerId).catch((err) => {
+          console.error(`Error fetching user ${customerId}:`, err);
+          return null; // Return null for failed user fetches
+        })
+      );
+      const userData = await Promise.all(userPromises);
+      const userMap = uniqueCustomerIds.reduce((acc, id, index) => {
+        if (userData[index]) {
+          acc[id] = userData[index];
+        }
+        return acc;
+      }, {});
+      console.log("Restaurant Data:", restaurantData);
+      console.log("User Data:", userMap);
+      console.log("Menu Data:", menuData);
       setOrderGroups({
         pending,
         preparing,
@@ -40,6 +72,12 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         picked,
         delivered,
       });
+
+      
+
+      setRestaurant(restaurantData);
+      setUser(userMap);
+      setMenuItems(Array.isArray(menuData?.data) ? menuData.data : []);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -71,8 +109,21 @@ const RestaurantAdminPage = ({ restaurantId }) => {
       console.error("Error picking up order:", error);
     }
   };
+console.log(orderGroups);
 
-  const renderOrder = (order) => (
+  const renderOrder = (order) =>{ 
+    const customer = user[order.customer];
+    console.log("Menu Items in renderOrder:", menuItems); // Debug menuItems
+    console.log("Order Items:", order.items); // Debug order.items
+
+    // Create a lookup map for menu items by _id, only if menuItems is an array
+    const menuItemMap = Array.isArray(menuItems)
+      ? menuItems.reduce((acc, item) => {
+          acc[item._id] = item;
+          return acc;
+        }, {})
+      : {};
+    return (
     <li
       key={order._id}
       className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
@@ -110,7 +161,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
               Customer
             </h4>
             <p className="font-medium text-gray-800">
-              {order.customer?.name || "Unknown"}
+              {customer?.name || "Unknown"}
             </p>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg">
@@ -118,7 +169,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
               Restaurant
             </h4>
             <p className="font-medium text-gray-800">
-              {order.restaurant?.name || "Unknown"}
+              {restaurant?.data.brandName || "Unknown"}
             </p>
           </div>
         </div>
@@ -135,7 +186,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
               >
                 <div>
                   <p className="font-medium text-gray-800">
-                    {item.menuItem?.name || "Unknown Item"}
+                  {menuItemMap[item.menuItem]?.name || "Unknown Item"}
                   </p>
                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                 </div>
@@ -179,7 +230,9 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         </div>
       </div>
     </li>
+
   );
+};
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

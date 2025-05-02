@@ -206,3 +206,81 @@ export const getCart = async (req, res) => {
     });
   }
 };
+
+export const updateUserDetails = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, email, phone, address } = req.body;
+
+    // Validate input
+    if (!name && !email && !phone && !address) {
+      return res.status(400).json({
+        status: 400,
+        message: 'At least one field must be provided for update',
+        code: 'INVALID_INPUT',
+      });
+    }
+
+    // Prepare update object
+    const updateFields = {};
+    if (name) updateFields.name = name;
+    if (email) updateFields.email = email;
+    if (phone) updateFields.phone = phone;
+    if (address) updateFields.address = address;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      updateFields,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: 'User not found',
+        code: 'USER_NOT_FOUND',
+      });
+    }
+
+    res.json({
+      status: 200,
+      message: 'User details updated successfully',
+      data: user,
+    });
+  } catch (err) {
+    console.error(`[SERVER_ERROR] ${err.message}`);
+    res.status(500).json({
+      status: 500,
+      message: 'Failed to update user details',
+      code: 'SERVER_ERROR',
+    });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: 'User not found',
+        code: 'USER_NOT_FOUND',
+      });
+    }
+
+    res.json({
+      status: 200,
+      message: 'User deleted successfully',
+    });
+  } catch (err) {
+    console.error(`[SERVER_ERROR] ${err.message}`);
+    res.status(500).json({
+      status: 500,
+      message: 'Failed to delete user',
+      code: 'SERVER_ERROR',
+    });
+  }
+};

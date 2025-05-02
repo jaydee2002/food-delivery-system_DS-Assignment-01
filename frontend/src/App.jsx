@@ -137,3 +137,28 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import UserProfile from "./pages/UserProfile.jsx";
+import TrackOrder from "./pages/TrackOrder.jsx";
+
+
+<Route path="/profile" element={<UserProfile />} />
+            <Route path="/track-order/:orderId" element={<TrackOrder />} />
