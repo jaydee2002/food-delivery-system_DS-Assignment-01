@@ -79,9 +79,7 @@ export const updateUserRole = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   try {
-    console.log(req.body);
     const { menuItem, quantity, price, restaurant } = req.body;
-    console.log(menuItem, quantity, price, restaurant);
     const userId = req.user._id; // From auth middleware
 
     if (!menuItem || !quantity || !price || !restaurant) {
@@ -143,7 +141,6 @@ export const addToCart = async (req, res) => {
     });
   }
 };
-
 export const getCart = async (req, res) => {
   try {
     const userId = req.user._id; // From auth middleware
@@ -162,16 +159,20 @@ export const getCart = async (req, res) => {
       user.cart.map(async (item) => {
         try {
           const menuItemResponse = await axios.get(
-            `${process.env.RESTAURANT_SERVICE_URL}/menu?menuItemId=${item.menuItem}`,
+            `${process.env.RESTAURANT_SERVICE_URL}/menu/${item.menuItem}`,
             {
               headers: { Authorization: req.headers.authorization },
             }
           );
           console.log('Menu item response:', menuItemResponse.data);
-          const menuItemDoc = menuItemResponse.data.data[0];
+
+          // Access the menu item object directly (not as an array)
+          const menuItemDoc = menuItemResponse.data.data;
+
           if (!menuItemDoc) {
             throw new Error('Menu item not found in response');
           }
+
           return {
             menuItem: item.menuItem,
             quantity: item.quantity,

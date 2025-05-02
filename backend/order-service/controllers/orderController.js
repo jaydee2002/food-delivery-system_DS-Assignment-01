@@ -51,13 +51,13 @@ export const placeOrder = async (req, res) => {
     // Validate menu items
     for (const item of items) {
       const menuItemResponse = await axios.get(
-        `${process.env.RESTAURANT_SERVICE_URL}/menu?menuItemId=${item.menuItem}`,
+        `${process.env.RESTAURANT_SERVICE_URL}/menu/${item.menuItem}`,
         {
           headers: { Authorization: req.headers.authorization },
         }
       );
       console.log('Menu item response:', menuItemResponse.data);
-      const menuItem = menuItemResponse.data.data[0];
+      const menuItem = menuItemResponse.data.data;
       if (!menuItem || menuItem.restaurant.toString() !== restaurantId) {
         return res.status(400).json({
           success: false,

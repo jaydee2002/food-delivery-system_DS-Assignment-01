@@ -165,11 +165,11 @@ export async function deleteMenuItem(req, res) {
 }
 
 export const getMenuItemById = async (req, res) => {
-  console.log('I am here at menu item ');
+  console.log('I am here at getMenuItemById ');
   try {
-    const { menuItemId } = req.params;
+    const { id } = req.params; // Use 'id' instead of 'menuItemId'
 
-    const menuItem = await MenuItem.findById(menuItemId);
+    const menuItem = await MenuItem.findById(id);
 
     if (!menuItem) {
       return res.status(404).json({
