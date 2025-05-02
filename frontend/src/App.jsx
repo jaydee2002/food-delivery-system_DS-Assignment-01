@@ -12,6 +12,9 @@ import AuthLayout from "./components/layout/AuthLayout.jsx";
 import Login from "./pages/Auth/Login.jsx";
 import Register from "./pages/Auth/Register.jsx";
 
+import UserProfile from "./pages/UserProfile.jsx";
+import TrackOrder from "./pages/TrackOrder.jsx";
+
 import DashboardLayout from "./components/layout/DashboardLayout.js";
 import SystemAdminDashboardLayout from "./components/layout/SystemAdminDashboardLayout.js";
 import RestaurantAdminDashboardLayout from "./components/layout/RestaurantAdminDashboardLayout.js";
@@ -30,7 +33,7 @@ import Analytics from "./pages/Dashboard/Analytics.jsx";
 import SalesReport from "./pages/Dashboard/SalesReport.jsx";
 import UserAnalytics from "./pages/Dashboard/UserAnalytics.jsx";
 import Settings from "./pages/Dashboard/Settings.jsx";
-import RestaurantAdminPage from "./pages/restaurantAdminPage.jsx";
+import RestaurantAdminPage from "./pages/Dashboard/RestaurantAdminPage.jsx";
 import MenuManagement from "./pages/Dashboard/MenuManagement.jsx";
 
 // import Profile from "./pages/main/Profile.jsx";
@@ -40,9 +43,9 @@ import SystemAdminPage from "./pages/systemAdminPage.jsx";
 
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
-import DeliveryDetails from "./pages/delivery-person/components/delivery-details.jsx";
-import ReadyDeliveries from "./pages/delivery-person/components/delivery-order.jsx";
-import MyDeliveries from "./pages/delivery-person/components/my-delivery.jsx";
+import DeliveryDetails from "./pages/Dashboard/delivery-details.jsx";
+import ReadyDeliveries from "./pages/Dashboard/delivery-order.jsx";
+import MyDeliveries from "./pages/Dashboard/my-delivery.jsx";
 
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
@@ -84,6 +87,8 @@ function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/payment" element={<DemPaymentPage />} />
               <Route path="/pay" element={<PaymentPage />} />
+              <Route path="/track-order/:orderId" element={<TrackOrder />} />
+              <Route path="/profile" element={<UserProfile />} />;
             </Route>
           </Route>
 
@@ -137,28 +142,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import UserProfile from "./pages/UserProfile.jsx";
-import TrackOrder from "./pages/TrackOrder.jsx";
-
-
-<Route path="/profile" element={<UserProfile />} />
-            <Route path="/track-order/:orderId" element={<TrackOrder />} />
