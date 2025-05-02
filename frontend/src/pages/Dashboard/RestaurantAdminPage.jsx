@@ -8,11 +8,12 @@ import {
   pickedOrder,
   prepareOrder,
   acceptOrder,
-} from "../services/api/orderLists.js";
-import { getRestaurantById, getMenuItemsByRestaurant} from "../services/restaurentServices.js";
-import { getUserById } from "../services/userServices.js";
-
-
+} from "../../services/api/orderLists.js";
+import {
+  getRestaurantById,
+  getMenuItemsByRestaurant,
+} from "../../services/restaurentServices.js";
+import { getUserById } from "../../services/userServices.js";
 
 const RestaurantAdminPage = ({ restaurantId }) => {
   const [orderGroups, setOrderGroups] = useState({
@@ -31,7 +32,15 @@ const RestaurantAdminPage = ({ restaurantId }) => {
 
   const fetchAllOrders = async () => {
     try {
-      const [pending, preparing, ready, picked, delivered, restaurantData, menuData] = await Promise.all([
+      const [
+        pending,
+        preparing,
+        ready,
+        picked,
+        delivered,
+        restaurantData,
+        menuData,
+      ] = await Promise.all([
         getPendingOrders(restaurantId),
         getPrepare(restaurantId),
         getPickup(restaurantId),
@@ -39,11 +48,15 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         getDelivered(restaurantId),
         getRestaurantById(restaurantId),
         getMenuItemsByRestaurant(restaurantId),
-        
       ]);
 
-
-      const allOrders = [...pending, ...preparing, ...ready, ...picked, ...delivered];
+      const allOrders = [
+        ...pending,
+        ...preparing,
+        ...ready,
+        ...picked,
+        ...delivered,
+      ];
       const uniqueCustomerIds = [
         ...new Set(allOrders.map((order) => order.customer).filter((id) => id)),
       ];
@@ -72,8 +85,6 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         picked,
         delivered,
       });
-
-      
 
       setRestaurant(restaurantData);
       setUser(userMap);
@@ -109,9 +120,9 @@ const RestaurantAdminPage = ({ restaurantId }) => {
       console.error("Error picking up order:", error);
     }
   };
-console.log(orderGroups);
+  console.log(orderGroups);
 
-  const renderOrder = (order) =>{ 
+  const renderOrder = (order) => {
     const customer = user[order.customer];
     console.log("Menu Items in renderOrder:", menuItems); // Debug menuItems
     console.log("Order Items:", order.items); // Debug order.items
@@ -124,115 +135,116 @@ console.log(orderGroups);
         }, {})
       : {};
     return (
-    <li
-      key={order._id}
-      className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
-    >
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h3 className="text-lg font-bold text-gray-800">
-              Order #{order._id.slice(-6).toUpperCase()}
-            </h3>
-            <p className="text-sm text-gray-500">
-              {new Date(order.createdAt).toLocaleString()}
-            </p>
+      <li
+        key={order._id}
+        className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">
+                Order #{order._id.slice(-6).toUpperCase()}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {new Date(order.createdAt).toLocaleString()}
+              </p>
+            </div>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                order.status === "pending"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : order.status === "preparing"
+                  ? "bg-blue-100 text-blue-800"
+                  : order.status === "ready-to-pickup"
+                  ? "bg-purple-100 text-purple-800"
+                  : order.status === "picked"
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-green-100 text-green-800"
+              }`}
+            >
+              {order.status.replace(/-/g, " ").toUpperCase()}
+            </span>
           </div>
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              order.status === "pending"
-                ? "bg-yellow-100 text-yellow-800"
-                : order.status === "preparing"
-                ? "bg-blue-100 text-blue-800"
-                : order.status === "ready-to-pickup"
-                ? "bg-purple-100 text-purple-800"
-                : order.status === "picked"
-                ? "bg-indigo-100 text-indigo-800"
-                : "bg-green-100 text-green-800"
-            }`}
-          >
-            {order.status.replace(/-/g, " ").toUpperCase()}
-          </span>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-100 p-3 rounded-lg">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-              Customer
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bg-gray-100 p-3 rounded-lg">
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                Customer
+              </h4>
+              <p className="font-medium text-gray-800">
+                {customer?.name || "Unknown"}
+              </p>
+            </div>
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                Restaurant
+              </h4>
+              <p className="font-medium text-gray-800">
+                {restaurant?.data.brandName || "Unknown"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              Order Items
             </h4>
-            <p className="font-medium text-gray-800">
-              {customer?.name || "Unknown"}
+            <ul className="space-y-2">
+              {order.items.map((item, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0"
+                >
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      {menuItemMap[item.menuItem]?.name || "Unknown Item"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Qty: {item.quantity}
+                    </p>
+                  </div>
+                  <p className="font-semibold">${item.price.toFixed(2)}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+            <p className="font-bold text-lg">
+              Total:{" "}
+              <span className="text-indigo-600">${order.total.toFixed(2)}</span>
             </p>
-          </div>
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-              Restaurant
-            </h4>
-            <p className="font-medium text-gray-800">
-              {restaurant?.data.brandName || "Unknown"}
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            Order Items
-          </h4>
-          <ul className="space-y-2">
-            {order.items.map((item, index) => (
-              <li
-                key={index}
-                className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0"
-              >
-                <div>
-                  <p className="font-medium text-gray-800">
-                  {menuItemMap[item.menuItem]?.name || "Unknown Item"}
-                  </p>
-                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                </div>
-                <p className="font-semibold">${item.price.toFixed(2)}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-          <p className="font-bold text-lg">
-            Total:{" "}
-            <span className="text-indigo-600">${order.total.toFixed(2)}</span>
-          </p>
-          <div className="space-x-2">
-            {order.status === "pending" && (
-              <button
-                onClick={() => acceptOrderHandler(order._id)}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Accept Order
-              </button>
-            )}
-            {order.status === "preparing" && (
-              <button
-                onClick={() => prepareOrderHandler(order._id)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              >
-                Mark as Ready
-              </button>
-            )}
-            {order.status === "ready-to-pickup" && (
-              <button
-                onClick={() => pickedOrderHandler(order._id)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-              >
-                Confirm Pickup
-              </button>
-            )}
+            <div className="space-x-2">
+              {order.status === "pending" && (
+                <button
+                  onClick={() => acceptOrderHandler(order._id)}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Accept Order
+                </button>
+              )}
+              {order.status === "preparing" && (
+                <button
+                  onClick={() => prepareOrderHandler(order._id)}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                >
+                  Mark as Ready
+                </button>
+              )}
+              {order.status === "ready-to-pickup" && (
+                <button
+                  onClick={() => pickedOrderHandler(order._id)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                >
+                  Confirm Pickup
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </li>
-
-  );
-};
+      </li>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
