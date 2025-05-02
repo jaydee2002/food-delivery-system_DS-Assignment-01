@@ -35,9 +35,9 @@ import SystemAdminPage from "./pages/systemAdminPage.jsx";
 
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
-import DeliveryDetails from "./pages/delivery-person/components/delivery-details.jsx";
-import ReadyDeliveries from "./pages/delivery-person/components/delivery-order.jsx";
-import MyDeliveries from "./pages/delivery-person/components/my-delivery.jsx";
+import DeliveryDetails from "./pages/Dashboard/delivery-details.jsx";
+import ReadyDeliveries from "./pages/Dashboard/delivery-order.jsx";
+import MyDeliveries from "./pages/Dashboard/my-delivery.jsx";
 
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
@@ -60,9 +60,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="/" element={<Home />} />
 
-            <Route path="/ready-deliveries" element={<ReadyDeliveries />} />
-            <Route path="/:deliveryId" element={<DeliveryDetails />} />
-            <Route path="/deliveries" element={<MyDeliveries />} />
+           
 
             {/* <Route
               path="/restaurant-admin"
@@ -140,7 +138,7 @@ function App() {
               path="/restaurant-admin"
               element={
                 <RestaurantAdminPage
-                  restaurantId={"64f9d5c0b6e4a3337f96789b"}
+                  restaurantId={"68136768ab02a496ecef7d8e"}
                 />
               }
             />
@@ -154,6 +152,9 @@ function App() {
             <Route path="/analytics/sales" element={<SalesReport />} />
             <Route path="/analytics/users" element={<UserAnalytics />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/ready-deliveries" element={<ReadyDeliveries />} />
+            <Route path="/:deliveryId" element={<DeliveryDetails />} />
+            <Route path="/deliveries" element={<MyDeliveries />} />
           </Route>
 
           {/* Catch all */}

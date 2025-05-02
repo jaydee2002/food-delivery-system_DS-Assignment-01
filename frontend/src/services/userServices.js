@@ -67,3 +67,14 @@ export const getCart = async () => {
     throw new Error(error.response?.data?.error || "Failed to fetch cart");
   }
 };
+
+export const getUserById = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Failed to fetch user details"
+    );
+  }
+}
