@@ -45,7 +45,7 @@ import PaymentPage from "./pages/PaymentPage.jsx";
 import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
 // import Sidebar from "./components/dashboard/Sidebar.jsx";
 
-import HomePage from "./components/HomePage";
+import HomePage from "./components/Restaurants.jsx";
 import RestaurantPage from "./components/RestaurantPage";
 import CartPage from "./components/CartPage";
 import CheckoutPage from "./components/CheckoutPage";
