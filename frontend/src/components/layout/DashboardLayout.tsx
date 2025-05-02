@@ -99,7 +99,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen font-sourceSans bg-gray-100">
+    <div className="flex h-screen font-sourceSans bg-gray-100">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:sticky md:top-0 md:translate-x-0 flex flex-col ${
@@ -437,7 +437,7 @@ const DashboardLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-y-auto">
         {/* Toggle Button for Mobile */}
         <div className="flex items-center p-3 md:hidden bg-white border-b border-gray-200">
           <button
@@ -465,8 +465,10 @@ const DashboardLayout = () => {
           </h1>
         </div>
         <main className="flex-1">
-          <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            <Outlet />
+          <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto h-full">
+            <div className="h-full overflow-y-auto">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>
