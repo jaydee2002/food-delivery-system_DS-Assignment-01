@@ -111,6 +111,14 @@ function App() {
               }
             >
               <Route path="/menu-management" element={<MenuManagement />} />
+              <Route
+                            path="/restaurant-admin"
+                            element={
+                              <RestaurantAdminPage
+                              restaurantId={"68136768ab02a496ecef7d8e"}
+                              />
+                            }
+              />
             </Route>
           </Route>
 
@@ -124,6 +132,10 @@ function App() {
               <Route path="/customers/all" element={<AllCustomers />} />
               <Route path="/customers/new" element={<NewCustomers />} />
               <Route path="/customers/vip" element={<VIPCustomers />} />
+               <Route path="/ready-deliveries" element={<ReadyDeliveries />} />
+              <Route path="/:deliveryId" element={<DeliveryDetails />} />
+              <Route path="/deliveries" element={<MyDeliveries />} />
+              
             </Route>
           </Route>
 
