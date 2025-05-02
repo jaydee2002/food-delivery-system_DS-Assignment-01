@@ -5,6 +5,8 @@ import {
   getUserByparam,
   addToCart,
   getCart,
+  updateUserDetails,
+  deleteUser
 } from '../controllers/userController.js';
 import { updateUserRole } from '../controllers/userController.js';
 
@@ -27,5 +29,14 @@ router.get('/cart', verifyAuth, getCart);
 
 // Added by Bavi for need in the Order Service
 router.get('/:id', getUserByparam);
+
+// Update user details (protected route)
+router.patch('/update', verifyAuth, updateUserDetails);
+
+// Delete user (protected route)
+router.delete('/delete', verifyAuth, deleteUser);
+
+//user profile route
+router.get('/profile', verifyAuth, userProfile);
 
 export default router;

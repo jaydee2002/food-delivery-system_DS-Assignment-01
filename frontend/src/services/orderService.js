@@ -27,3 +27,31 @@ export const submitOrder = async (orderData) => {
     throw new Error(error.response?.data?.error || "Failed to submit order");
   }
 };
+
+export const getOrderUser = async () => {
+  try {
+    const response = await orderService.get(`/orders`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || "Failed to fetch order");
+  }
+};
+
+export const getAllOrders = async () => {
+  try {
+    const response = await orderService.get("/orders/admin");
+    return response.data;
+  } catch (error) {
+    console.error("Error while fetching: ", error);
+    throw error;
+  }
+};
+
+export const trackOrder = async (orderId) => {
+  try {
+    const response = await orderService.get(`/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch order details');
+  }
+};

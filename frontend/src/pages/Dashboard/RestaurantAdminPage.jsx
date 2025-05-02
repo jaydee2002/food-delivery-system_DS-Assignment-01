@@ -8,9 +8,9 @@ import {
   pickedOrder,
   prepareOrder,
   acceptOrder,
-} from "../services/api/orderLists.js";
-import { getRestaurantById, getMenuItemsByRestaurant} from "../services/restaurentServices.js";
-import { getUserById } from "../services/userServices.js";
+} from "../../services/api/orderLists.js";
+import { getRestaurantById, getMenuItemsByRestaurant} from "../../services/restaurentServices.js";
+import { getUserById } from "../../services/userServices.js";
 
 
 

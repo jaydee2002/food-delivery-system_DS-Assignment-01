@@ -1,4 +1,6 @@
 import axios from "axios";
+import { getOrderUser, trackOrder as trackOrderFromOrderService  } from './orderService';
+
 
 const API_BASE = "/api/user";
 
@@ -78,3 +80,38 @@ export const getUserById = async (userId) => {
     );
   }
 }
+
+export const updateUserDetails = async (userDetails) => {
+  try {
+    const response = await axiosInstance.patch('/update', userDetails);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to update user details');
+  }
+};
+
+export const deleteUser = async () => {
+  try {
+    const response = await axiosInstance.delete('/delete');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete user');
+  }
+};
+
+export const getUserProfile = async () => {
+  try {
+    const response = await axiosInstance.get('/profile');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch user profile');
+  }
+};
+
+export const getOrders = async () => {
+  return getOrderUser();
+};
+
+export const trackOrder = async (orderId) => {
+  return trackOrderFromOrderService(orderId);
+};
