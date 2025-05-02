@@ -97,6 +97,7 @@ import {
 
 const router = express.Router();
 
+router.get('/', customerAuthMiddleware, getOrders);
 //System Admin
 router.get('/admin', getAllOrders);
 
@@ -108,7 +109,7 @@ router.patch('/:id/deliver', deliverOrder);
 router.post('/', verifyAuth, placeOrder);
 router.patch('/:id', updateOrder);
 router.get('/:id', trackOrder);
-router.get('/', getOrders);
+
 router.delete('/:id', cancelOrder);
 
 //Restaurant Admin

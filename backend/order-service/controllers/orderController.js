@@ -478,69 +478,16 @@ export const trackOrder = async (req, res) => {
 //Customer Past Orders
 export const getOrders = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'User not authenticated', code: 'UNAUTHENTICATED' });
+    }
+
     const orders = await Order.find({ customer: req.user.id });
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(`[SERVER_ERROR] ${err.message}`);
+    res.status(500).json({ message: 'Failed to fetch orders', error: err.message });
   }
-
-  // try {
-  //   const orders = await Order.find({ customer: req.user.id });
-  //   // Enrich orders with restaurant and menu item data
-  //   const enrichedOrders = await Promise.all(
-  //     orders.map(async (order) => {
-  //       // Fetch restaurant data from Restaurant service
-  //       let restaurant;
-  //       try {
-  //         const restaurantResponse = await axios.get(
-  //           `${process.env.RESTAURANT_SERVICE_URL}/api/restaurants/${order.restaurant}`
-  //         );
-  //         restaurant = restaurantResponse.data;
-  //       } catch (err) {
-  //         restaurant = {
-  //           _id: order.restaurant,
-  //           error: 'Restaurant not found or service unavailable',
-  //         };
-  //       }
-
-  //       // Fetch menu item data for each item
-  //       const items = await Promise.all(
-  //         order.items.map(async (item) => {
-  //           try {
-  //             const menuItemResponse = await axios.get(
-  //               `${process.env.RESTAURANT_SERVICE_URL}/api/menu-items/${item.menuItem}`
-  //             );
-  //             return {
-  //               menuItem: menuItemResponse.data,
-  //               quantity: item.quantity,
-  //               price: item.price,
-  //             };
-  //           } catch (err) {
-  //             return {
-  //               menuItem: {
-  //                 _id: item.menuItem,
-  //                 error: 'Menu item not found or service unavailable',
-  //               },
-  //               quantity: item.quantity,
-  //               price: item.price,
-  //             };
-  //           }
-  //         })
-  //       );
-
-  //       // Return enriched order
-  //       return {
-  //         ...order.toObject(),
-  //         restaurant,
-  //         items,
-  //       };
-  //     })
-  //   );
-
-  //   res.json(enrichedOrders);
-  // } catch (err) {
-  //   res.status(500).json({ message: err.message });
-  // }
 };
 
 //Admin Orders
@@ -550,10 +497,7 @@ export const getAllOrders = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        
 
         // // Fetch restaurant data from Restaurant service
         // const restaurantResponse = await axios.get(
@@ -578,7 +522,7 @@ export const getAllOrders = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          
           // restaurant,
           // items,
         };
