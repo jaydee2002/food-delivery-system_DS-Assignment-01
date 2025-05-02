@@ -164,7 +164,6 @@ export const getCart = async (req, res) => {
               headers: { Authorization: req.headers.authorization },
             }
           );
-          console.log('Menu item response:', menuItemResponse.data);
 
           // Access the menu item object directly (not as an array)
           const menuItemDoc = menuItemResponse.data.data;

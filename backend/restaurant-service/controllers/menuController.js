@@ -29,7 +29,6 @@ export async function createMenuItem(req, res) {
       data: menuItem,
     });
   } catch (error) {
-    console.error('Error creating menu item:', error);
     if (req.file) {
       await fs.unlink(req.file.path).catch(() => {});
     }
@@ -41,7 +40,6 @@ export async function createMenuItem(req, res) {
 }
 
 export async function getMenuItems(req, res) {
-  console.log('I am here at getMenuItems');
   try {
     const restaurant = await Restaurant.findOne({ owner: req.user._id });
     if (!restaurant) {
@@ -60,7 +58,6 @@ export async function getMenuItems(req, res) {
       data: menuItems,
     });
   } catch (error) {
-    console.error('Error fetching menu items:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch menu items',
@@ -112,7 +109,6 @@ export async function updateMenuItem(req, res) {
       data: menuItem,
     });
   } catch (error) {
-    console.error('Error updating menu item:', error);
     if (req.file) {
       await fs.unlink(req.file.path).catch(() => {});
     }
@@ -156,7 +152,6 @@ export async function deleteMenuItem(req, res) {
       data: {},
     });
   } catch (error) {
-    console.error('Error deleting menu item:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete menu item',
@@ -165,7 +160,6 @@ export async function deleteMenuItem(req, res) {
 }
 
 export const getMenuItemById = async (req, res) => {
-  console.log('I am here at getMenuItemById ');
   try {
     const { id } = req.params; // Use 'id' instead of 'menuItemId'
 
@@ -183,7 +177,6 @@ export const getMenuItemById = async (req, res) => {
       data: menuItem,
     });
   } catch (error) {
-    console.error('Error fetching menu item:', error);
     res.status(500).json({
       success: false,
       error: 'Server error',

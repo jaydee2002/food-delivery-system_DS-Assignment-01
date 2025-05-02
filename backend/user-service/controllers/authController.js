@@ -15,7 +15,6 @@ export const registerUser = async (req, res) => {
 
   // Validation
   if (!name || !email || !password) {
-    console.log('Missing fields:', { name, email, password });
     return res.status(400).json({
       status: 400,
       message: 'Name, email, and password are required',

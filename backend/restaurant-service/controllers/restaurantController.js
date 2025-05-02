@@ -103,7 +103,6 @@ export async function getAllRestaurants(req, res) {
 
 // Get single restaurant by ID
 export async function getRestaurantById(req, res) {
-  console.log('i am in getRestaurantById');
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({

@@ -14,7 +14,6 @@ export const verifyAuth = async (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  console.log('Token received:', token);
 
   // Check if JWT_SECRET is defined
   if (!process.env.JWT_SECRET) {
@@ -26,11 +25,9 @@ export const verifyAuth = async (req, res, next) => {
   }
 
   try {
-    console.log('Verifying token with JWT_SECRET');
     const decoded = jwt.verify(token, process.env.JWT_SECRET, {
       algorithms: ['HS256'],
     });
-    console.log('Token decoded:', decoded);
 
     // Validate required fields in token payload
     if (!decoded.id || !decoded.role) {
@@ -55,7 +52,7 @@ export const verifyAuth = async (req, res, next) => {
       _id: new mongoose.Types.ObjectId(decoded.id),
       role: decoded.role,
     };
-    console.log('User attached to request:', req.user);
+
     next();
   } catch (error) {
     console.error(`Authentication error: ${error.name} - ${error.message}`, {

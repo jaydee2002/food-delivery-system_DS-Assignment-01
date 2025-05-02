@@ -31,8 +31,6 @@ export const placeOrder = async (req, res) => {
       });
     }
 
-    console.log(process.env.RESTAURANT_SERVICE_URL);
-
     // Validate restaurant via Restaurant Service
     const restaurantResponse = await axios.get(
       `${process.env.RESTAURANT_SERVICE_URL}/restaurants/${restaurantId}`
@@ -46,8 +44,6 @@ export const placeOrder = async (req, res) => {
       });
     }
 
-    console.log('Fine so far');
-
     // Validate menu items
     for (const item of items) {
       const menuItemResponse = await axios.get(
@@ -56,7 +52,7 @@ export const placeOrder = async (req, res) => {
           headers: { Authorization: req.headers.authorization },
         }
       );
-      console.log('Menu item response:', menuItemResponse.data);
+
       const menuItem = menuItemResponse.data.data;
       if (!menuItem || menuItem.restaurant.toString() !== restaurantId) {
         return res.status(400).json({
@@ -146,7 +142,7 @@ export const placeOrder = async (req, res) => {
 //     io.emit('newOrder', order);
 //     res.status(201).json(order);
 //   } catch (error) {
-//     console.log('eoorr', error);
+//     console.error('eoorr', error);
 //     res.status(500).json({ message: 'Error in Placing Order' });
 //   }
 // };
@@ -233,7 +229,6 @@ export const acceptOrder = async (req, res) => {
     io.emit('orderStatusUpdate', order);
     res.json({ message: 'Order accepted and set to preparing', order });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: err.message });
   }
 };

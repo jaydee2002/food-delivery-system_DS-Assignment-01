@@ -19,8 +19,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
-    // Remove console.log in production
-    // console.log(token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -42,7 +41,6 @@ export const getRestaurants = async () => {
 
 export const getMenuItemsByRestaurant = async (restaurantId) => {
   try {
-    console.log(restaurantId);
     const response = await axiosInstance.get(
       `/menu?restaurantId=${restaurantId}`
     );
