@@ -5,6 +5,9 @@ import './PaymentHistory.css';
 const PaymentHistory = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [methodFilter, setMethodFilter] = useState('all');
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -22,6 +25,24 @@ const PaymentHistory = () => {
     fetchPayments();
   }, []);
 
+  // Filtering logic: includes search by orderId and userId
+  const filteredPayments = payments.filter((payment) => {
+    // Search by Order ID or User ID
+    const matchesSearchTerm =
+      payment.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.userId.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Filter by Status
+    const matchesStatus =
+      statusFilter === 'all' || payment.status === statusFilter;
+
+    // Filter by Payment Method
+    const matchesMethod =
+      methodFilter === 'all' || payment.method === methodFilter;
+
+    return matchesSearchTerm && matchesStatus && matchesMethod;
+  });
+
   if (loading) {
     return <div>Loading payment records...</div>;
   }
@@ -30,22 +51,35 @@ const PaymentHistory = () => {
     <div className="payment-history">
       <h2>Payment Records</h2>
       <div className="filter">
+        {/* Search by Order ID or User ID */}
         <input
           type="text"
           placeholder="Search by Order ID or User ID"
-          // Implement search functionality here
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select>
+
+        {/* Status Filter */}
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="success">Success</option>
         </select>
-        <select>
+
+        {/* Payment Method Filter */}
+        <select
+          value={methodFilter}
+          onChange={(e) => setMethodFilter(e.target.value)}
+        >
           <option value="all">All Methods</option>
           <option value="cash">Cash</option>
           <option value="card">Card</option>
         </select>
       </div>
+
       <table className="payment-table">
         <thead>
           <tr>
@@ -58,7 +92,7 @@ const PaymentHistory = () => {
           </tr>
         </thead>
         <tbody>
-          {payments.map((payment) => (
+          {filteredPayments.map((payment) => (
             <tr key={payment._id}>
               <td>{payment.orderId}</td>
               <td>{payment.userId}</td>

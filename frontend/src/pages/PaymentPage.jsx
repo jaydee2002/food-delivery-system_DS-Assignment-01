@@ -18,7 +18,7 @@ const PaymentPage = () => {
     // Additional form fields (user_id, payment_method)
     const paymentDetails = {
       order_id: orderId,
-      amount: "3500.00",
+      amount: "5500.00",
       currency: "LKR",
       first_name: "Saman",
       last_name: "Perera",
@@ -54,7 +54,7 @@ const PaymentPage = () => {
           merchant_id: merchant_id,
           return_url: "http://localhost:5173/pay",
           cancel_url: "http://localhost:5173/pay", 
-          notify_url: "https://2204-2402-4000-2260-e928-7862-8cd3-11ba-9289.ngrok-free.app/payment/notify", 
+          notify_url: "https://ea3d-124-43-209-182.ngrok-free.app/payment/notify",
           order_id: paymentDetails.order_id,
           items: "Item Title",
           amount: paymentDetails.amount,
