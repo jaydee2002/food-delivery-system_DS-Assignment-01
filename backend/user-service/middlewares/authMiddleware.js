@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel.js';
+import User from '../models/User.js';
 
 // Middleware to verify authentication token and attach user
 export const verifyAuth = async (req, res, next) => {
