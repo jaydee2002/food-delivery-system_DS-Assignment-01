@@ -31,6 +31,8 @@ import Profile from "./pages/main/Profile.jsx";
 import PageNotFound from "./pages/errors/PageNotFound.jsx";
 import Unauthorized from "./pages/errors/Unauthorized.jsx";
 
+import PaymentPage from "./pages/PaymentPage.jsx";
+import PaymentHistory from "./pages/PaymentHistory.jsx"; // Import PaymentHistory page
 // import Sidebar from "./components/dashboard/Sidebar.jsx";
 
 function App() {
@@ -64,6 +66,11 @@ function App() {
                 </RoleProtectedRoute>
               }
             />
+            <Route path="/pay" element={<PaymentPage />} />
+            <Route path="/payment-history" element={<PaymentHistory />} />{" "}
+            {/* New route for Payment History */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<PageNotFound />} />
           </Route>
 
           <Route element={<DashboardLayout />}>
@@ -84,7 +91,7 @@ function App() {
             <Route path="/analytics/users" element={<UserAnalytics />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
-          {/* <Route path="/sidebar" element={<Sidebar />} /> */}
+
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
