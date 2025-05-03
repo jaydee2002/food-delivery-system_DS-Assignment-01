@@ -1,13 +1,13 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import User from '../models/userModel.js';
+import User from '../models/User.js';
 import validator from 'validator';
 
 const generateToken = (id, role) => {
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined in environment variables');
   }
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 export const registerUser = async (req, res) => {
