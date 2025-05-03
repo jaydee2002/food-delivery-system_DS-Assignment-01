@@ -8,7 +8,7 @@ const deliveryApi = axios.create({
 });
 
 const orderApi = axios.create({
-  baseURL: import.meta.env.VITE_API_ORDER_BASE_URL || 'http://localhost:3003/api/orders',
+  baseURL: 'http://localhost:3003/api/orders',
   headers: {
     'Content-Type': 'application/json',
   },
