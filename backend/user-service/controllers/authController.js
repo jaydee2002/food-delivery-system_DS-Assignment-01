@@ -13,7 +13,7 @@ const generateToken = (id, role) => {
 export const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
 
-  // Validation
+  // validation
   if (!name || !email || !password) {
     console.log('Missing fields:', { name, email, password });
     return res.status(400).json({
@@ -23,7 +23,7 @@ export const registerUser = async (req, res) => {
     });
   }
 
-  // Check if user already exists
+  // check if the user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return res.status(409).json({
@@ -34,18 +34,18 @@ export const registerUser = async (req, res) => {
   }
 
   try {
-    // Hash password
+    // hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user
+    // create user
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role, // If role is undefined, schema default ('customer') will apply
+      role, // if role is undefined, schema default ('customer') will apply
     });
 
-    // Send response
+    // send response
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -54,12 +54,12 @@ export const registerUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (error) {
-    console.error('Registration error:', error); // Log the full error
+    console.error('Registration error:', error); // log the full error
     res.status(500).json({
       status: 500,
       message: 'Failed to register user',
       code: 'SERVER_ERROR',
-      error: error.message, // Include error message for debugging
+      error: error.message, // include error message for debugging
     });
   }
 };
