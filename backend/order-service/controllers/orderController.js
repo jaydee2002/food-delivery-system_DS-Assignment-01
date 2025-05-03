@@ -479,14 +479,18 @@ export const trackOrder = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: 'User not authenticated', code: 'UNAUTHENTICATED' });
+      return res
+        .status(401)
+        .json({ message: 'User not authenticated', code: 'UNAUTHENTICATED' });
     }
 
     const orders = await Order.find({ customer: req.user.id });
     res.json(orders);
   } catch (err) {
     console.error(`[SERVER_ERROR] ${err.message}`);
-    res.status(500).json({ message: 'Failed to fetch orders', error: err.message });
+    res
+      .status(500)
+      .json({ message: 'Failed to fetch orders', error: err.message });
   }
 };
 
@@ -497,7 +501,6 @@ export const getAllOrders = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        
 
         // // Fetch restaurant data from Restaurant service
         // const restaurantResponse = await axios.get(
@@ -522,7 +525,7 @@ export const getAllOrders = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          
+
           // restaurant,
           // items,
         };
