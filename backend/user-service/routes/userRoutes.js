@@ -6,7 +6,7 @@ import {
   addToCart,
   getCart,
   updateUserDetails,
-  deleteUser
+  deleteUser,
 } from '../controllers/userController.js';
 import { updateUserRole } from '../controllers/userController.js';
 

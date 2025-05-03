@@ -8,6 +8,7 @@ import {
   updateRestaurant,
   deleteRestaurant,
   getMenuItemsByRestaurant,
+  getRestaurantByOwner
 } from '../controllers/restaurantController.js';
 import { verifyAuth, restrictTo } from '../middlewares/authMiddleware.js';
 
@@ -38,6 +39,12 @@ router.patch(
 // Fetch menu items for a specific restaurant
 router.get('/menu', getMenuItemsByRestaurant);
 
+router.get(
+  '/owner',
+  verifyAuth,
+  restrictTo('restaurant_admin'),
+  getRestaurantByOwner
+);
 router.get('/', getAllRestaurants);
 router.get('/:id', getRestaurantById);
 router.put('/:id', updateRestaurant);

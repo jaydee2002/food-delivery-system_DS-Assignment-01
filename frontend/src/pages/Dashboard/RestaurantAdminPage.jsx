@@ -16,6 +16,7 @@ import {
 import { getUserById } from "../../services/userServices.js";
 
 const RestaurantAdminPage = ({ restaurantId }) => {
+  console.log("Restaurant ID:", restaurantId);
   const [orderGroups, setOrderGroups] = useState({
     pending: [],
     preparing: [],
@@ -26,11 +27,17 @@ const RestaurantAdminPage = ({ restaurantId }) => {
   const [restaurant, setRestaurant] = useState(null);
   const [user, setUser] = useState({});
   const [menuItems, setMenuItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetchAllOrders();
+    if (restaurantId) {
+      fetchAllOrders();
+    }
   }, [restaurantId]);
 
   const fetchAllOrders = async () => {
+    setIsLoading(true);
     try {
       const [
         pending,
@@ -65,7 +72,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
       const userPromises = uniqueCustomerIds.map((customerId) =>
         getUserById(customerId).catch((err) => {
           console.error(`Error fetching user ${customerId}:`, err);
-          return null; // Return null for failed user fetches
+          return null;
         })
       );
       const userData = await Promise.all(userPromises);
@@ -75,9 +82,11 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         }
         return acc;
       }, {});
+
       console.log("Restaurant Data:", restaurantData);
       console.log("User Data:", userMap);
       console.log("Menu Data:", menuData);
+
       setOrderGroups({
         pending,
         preparing,
@@ -85,12 +94,14 @@ const RestaurantAdminPage = ({ restaurantId }) => {
         picked,
         delivered,
       });
-
       setRestaurant(restaurantData);
       setUser(userMap);
       setMenuItems(Array.isArray(menuData?.data) ? menuData.data : []);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setError(error.message || "Failed to fetch orders");
+      setIsLoading(false);
     }
   };
 
@@ -120,20 +131,22 @@ const RestaurantAdminPage = ({ restaurantId }) => {
       console.error("Error picking up order:", error);
     }
   };
-  console.log(orderGroups);
+
+  console.log("Order Groups:", orderGroups);
 
   const renderOrder = (order) => {
     const customer = user[order.customer];
-    console.log("Menu Items in renderOrder:", menuItems); // Debug menuItems
-    console.log("Order Items:", order.items); // Debug order.items
+    console.log("Menu Items in renderOrder:", menuItems);
+    console.log("Order Items:", order.items);
 
-    // Create a lookup map for menu items by _id, only if menuItems is an array
+    // Create a lookup map for menu items by _id
     const menuItemMap = Array.isArray(menuItems)
       ? menuItems.reduce((acc, item) => {
           acc[item._id] = item;
           return acc;
         }, {})
       : {};
+
     return (
       <li
         key={order._id}
@@ -197,7 +210,9 @@ const RestaurantAdminPage = ({ restaurantId }) => {
                 >
                   <div>
                     <p className="font-medium text-gray-800">
-                      {menuItemMap[item.menuItem]?.name || "Unknown Item"}
+                      {menuItemMap[item.menuItem?._id || item.menuItem]?.name ||
+                        item.menuItem?.name ||
+                        "Unknown Item"}
                     </p>
                     <p className="text-sm text-gray-500">
                       Qty: {item.quantity}
@@ -246,6 +261,43 @@ const RestaurantAdminPage = ({ restaurantId }) => {
     );
   };
 
+  if (!restaurantId) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            No Restaurant Selected
+          </h2>
+          <p className="text-gray-600">
+            Please ensure you are logged in as a restaurant owner.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Loading...</h2>
+          <p className="text-gray-600">Fetching restaurant orders...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
+          <p className="text-red-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -254,7 +306,7 @@ const RestaurantAdminPage = ({ restaurantId }) => {
             Order Management
           </h2>
           <p className="text-gray-600">
-            Manage all restaurant orders in one place
+            Manage all restaurant orders for {restaurant?.data.brandName || 'Unknown'}
           </p>
         </div>
 

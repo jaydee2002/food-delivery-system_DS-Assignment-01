@@ -166,8 +166,7 @@ export const updateDeliveryStatus = async (req, res) => {
 
 export const getDeliveries = async (req, res) => {
   try {
-    const driverId = '67fe8ac2ef707d93f35bab1f';
-    const deliveries = await Delivery.find({ driver: driverId });
+    const deliveries = await Delivery.find({ driver: req.user.id });
     res.json(deliveries);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -177,6 +176,19 @@ export const getDeliveries = async (req, res) => {
 export const getDeliveryById = async (req, res) => {
   try {
     const delivery = await Delivery.findById(req.params.id);
+    if (!delivery) {
+      return res.status(404).json({ message: 'Delivery not found' });
+    }
+    res.json(delivery);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+export const getDeliveryByOrderId = async (req, res) => {
+  try {
+    const delivery = await Delivery.findOne({ order: req.params.id });
     if (!delivery) {
       return res.status(404).json({ message: 'Delivery not found' });
     }

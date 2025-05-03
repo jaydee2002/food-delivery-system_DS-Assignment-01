@@ -33,7 +33,6 @@ import Analytics from "./pages/Dashboard/Analytics.jsx";
 import SalesReport from "./pages/Dashboard/SalesReport.jsx";
 import UserAnalytics from "./pages/Dashboard/UserAnalytics.jsx";
 import Settings from "./pages/Dashboard/Settings.jsx";
-import RestaurantAdminPage from "./pages/Dashboard/RestaurantAdminPage.jsx";
 import MenuManagement from "./pages/Dashboard/MenuManagement.jsx";
 
 // import Profile from "./pages/main/Profile.jsx";
@@ -57,6 +56,9 @@ import RestaurantPage from "./components/RestaurantPage";
 import CartPage from "./components/CartPage";
 import CheckoutPage from "./components/CheckoutPage";
 import DemPaymentPage from "./components/PaymentPage";
+
+
+import RestaurantAdminWrapper from "./components/RestaurantAdminWrapper.jsx";
 
 function App() {
   return (
@@ -118,8 +120,8 @@ function App() {
               <Route
                 path="/restaurant-admin"
                 element={
-                  <RestaurantAdminPage
-                    restaurantId={"68136768ab02a496ecef7d8e"}
+                  <RestaurantAdminWrapper
+                    
                   />
                 }
               />

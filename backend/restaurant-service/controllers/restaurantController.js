@@ -265,3 +265,27 @@ export const getMenuItemsByRestaurant = async (req, res) => {
     });
   }
 };
+
+
+export const getRestaurantByOwner = async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findOne({ owner: req.user._id });
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: restaurant,
+    });
+  } catch (error) {
+    console.error('Error fetching restaurant by owner:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch restaurant',
+    });
+  }
+};

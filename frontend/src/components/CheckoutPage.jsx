@@ -63,12 +63,15 @@ function CheckoutPage() {
           <p className="text-gray-600">Order ID: {order._id}</p>
           <p className="text-gray-600">Total: ${order.total.toFixed(2)}</p>
           <p className="text-gray-600">Payment Method: Cash on Delivery</p>
+          <div className="flex justify-between items-center">
           <button
             onClick={() => navigate("/")}
             className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Back to Home
           </button>
+          <button onClick={() => navigate(`/track-order/${order._id}`)} className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Track Order</button>
+          </div>
         </div>
       ) : (
         <div className="bg-white p-6 rounded-lg shadow">
