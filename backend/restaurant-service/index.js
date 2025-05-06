@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import restaurantRoutes from './routes/restaurantRoutes.js';
+import menuRoutes from './routes/menuRoutes.js';
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ connectDB();
 
 // Routes
 app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/menu', menuRoutes);
+app.use('/api/uploads', express.static('uploads'));
 
 // Root endpoint
 app.get('/', (req, res) => {

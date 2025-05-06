@@ -19,8 +19,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
-    // Remove console.log in production
-    // console.log(token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,6 +27,30 @@ axiosInstance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+export const getRestaurants = async () => {
+  try {
+    const response = await axiosInstance.get("/");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Failed to fetch restaurants"
+    );
+  }
+};
+
+export const getMenuItemsByRestaurant = async (restaurantId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/menu?restaurantId=${restaurantId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Failed to fetch menu items"
+    );
+  }
+};
 
 // Create a new restaurant
 export const createRestaurant = async (restaurantData) => {
@@ -153,3 +176,16 @@ export const deleteRestaurant = async (id) => {
     throw error.response?.data?.error || "Failed to delete restaurant";
   }
 };
+
+export const getRestaurantByOwner = async () => {
+  try {
+    const response = await axiosInstance.get("/owner");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching restaurant by owner:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data?.error || "Failed to fetch restaurant by owner";
+  }
+}

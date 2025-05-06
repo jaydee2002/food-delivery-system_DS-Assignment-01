@@ -6,6 +6,13 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  address: {
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipcode: { type: String, required: true },
+    countryCode: { type: String, required: true },
+  },
   restaurant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Restaurant',
@@ -22,6 +29,11 @@ const orderSchema = new mongoose.Schema({
       price: { type: Number, required: true },
     },
   ],
+  paymentMethod: {
+    type: String,
+    enum: ['cod', 'online'],
+    required: true,
+  },
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'failed'],

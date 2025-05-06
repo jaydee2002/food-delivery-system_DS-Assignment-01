@@ -21,9 +21,20 @@ const DashboardLayout = () => {
       icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
     },
     {
-      label: "RestaurantApproval",
+      label: "Restaurant Approval",
       path: "/restaurant-approval",
       icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+    },
+    {
+      label: "Restaurant Admin",
+      path: "/restaurant-admin",
+      icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+      hasDropdown: true,
+      submenu: [
+        { label: "Menu management", path: "/menu-management" },
+        { label: "New Customers", path: "/customers/new" },
+        { label: "VIP Customers", path: "/customers/vip" },
+      ],
     },
     {
       label: "Customers",
@@ -88,7 +99,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen font-sourceSans bg-gray-100">
+    <div className="flex h-screen font-sourceSans bg-gray-100">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:sticky md:top-0 md:translate-x-0 flex flex-col ${
@@ -426,7 +437,7 @@ const DashboardLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-y-auto">
         {/* Toggle Button for Mobile */}
         <div className="flex items-center p-3 md:hidden bg-white border-b border-gray-200">
           <button
@@ -454,8 +465,10 @@ const DashboardLayout = () => {
           </h1>
         </div>
         <main className="flex-1">
-          <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            <Outlet />
+          <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto h-full">
+            <div className="h-full overflow-y-auto">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

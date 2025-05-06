@@ -25,6 +25,30 @@ const userSchema = new mongoose.Schema(
       ],
       default: 'customer',
     },
+    cart: [
+      {
+        menuItem: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'MenuItem',
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+        price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        restaurant: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Restaurant',
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

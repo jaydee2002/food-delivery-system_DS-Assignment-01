@@ -1,36 +1,151 @@
 import Order from '../models/Order.js';
 import { io } from '../index.js';
 import axios from 'axios';
+import Stripe from 'stripe';
 
-//Place Order
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-04-10',
+});
+
 export const placeOrder = async (req, res) => {
-  const { restaurantId, items } = req.body;
   try {
+    const { restaurantId, items, address, paymentMethod, paymentIntent } =
+      req.body;
+    const userId = req.user._id; // From auth middleware
+
+    // Validate request
+    if (
+      !restaurantId ||
+      !items ||
+      !items.length ||
+      !address ||
+      !paymentMethod
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID, items, address, and payment method are required',
+      });
+    }
+
+    // Validate restaurant via Restaurant Service
+    const restaurantResponse = await axios.get(
+      `${process.env.RESTAURANT_SERVICE_URL}/restaurants/${restaurantId}`
+    );
+
+    const restaurant = restaurantResponse.data.data;
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        error: 'Restaurant not found',
+      });
+    }
+
+    // Validate menu items
+    for (const item of items) {
+      const menuItemResponse = await axios.get(
+        `${process.env.RESTAURANT_SERVICE_URL}/menu/${item.menuItem}`,
+        {
+          headers: { Authorization: req.headers.authorization },
+        }
+      );
+
+      const menuItem = menuItemResponse.data.data;
+      if (!menuItem || menuItem.restaurant.toString() !== restaurantId) {
+        return res.status(400).json({
+          success: false,
+          error: `Menu item ${item.menuItem} is invalid or does not belong to the restaurant`,
+        });
+      }
+      if (item.price !== menuItem.price) {
+        return res.status(400).json({
+          success: false,
+          error: `Price mismatch for menu item ${item.menuItem}`,
+        });
+      }
+    }
+
+    // Calculate total
     const total = items.reduce(
-      (sum, item) => sum + item.quantity * item.price,
+      (sum, item) => sum + item.price * item.quantity,
       0
     );
+
+    // Create order
     const order = new Order({
-      customer: req.user.id,
+      customer: userId,
       restaurant: restaurantId,
       items,
+      address,
+      paymentMethod,
       total,
+      paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending',
     });
+
     await order.save();
 
-    // const paymentResponse = await axios.post(
-    //   'http://localhost:3000/api/payments/process',
-    //   { orderId: order._id, amount: total },
-    //   { headers: { Authorization: `Bearer ${req.header('Authorization')}` } }
-    // );
+    if (paymentMethod === 'online' && paymentIntent) {
+      // Create Stripe Payment Intent
+      const paymentIntent = await stripeClient.paymentIntents.create({
+        amount: Math.round(total * 100), // Convert to cents
+        currency: 'usd',
+        metadata: { orderId: order._id.toString() },
+      });
 
-    io.emit('newOrder', order);
-    res.status(201).json(order);
+      return res.status(200).json({
+        success: true,
+        data: {
+          clientSecret: paymentIntent.client_secret,
+          order,
+        },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: order,
+    });
   } catch (error) {
-    console.log('eoorr', error);
-    res.status(500).json({ message: 'Error in Placing Order' });
+    console.error('Error creating order:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create order',
+    });
   }
 };
+
+// //Place Order
+// export const placeOrder = async (req, res) => {
+//   const { restaurantId, items } = req.body;
+//   try {
+//     const total = items.reduce(
+//       (sum, item) => sum + item.quantity * item.price,
+//       0
+//     );
+//     const order = new Order({
+//       customer: req.user.id,
+//       restaurant: restaurantId,
+//       items,
+//       total,
+//     });
+//     await order.save();
+
+//     // const paymentResponse = await axios.post(
+//     //   'http://localhost:3000/api/payments/process',
+//     //   { orderId: order._id, amount: total },
+//     //   { headers: { Authorization: `Bearer ${req.header('Authorization')}` } }
+//     // );
+
+//     io.emit('newOrder', order);
+//     res.status(201).json(order);
+//   } catch (error) {
+//     console.error('eoorr', error);
+//     res.status(500).json({ message: 'Error in Placing Order' });
+//   }
+// };
 
 //Before Confirmation Update Order
 export const updateOrder = async (req, res) => {
@@ -114,7 +229,6 @@ export const acceptOrder = async (req, res) => {
     io.emit('orderStatusUpdate', order);
     res.json({ message: 'Order accepted and set to preparing', order });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -175,10 +289,10 @@ export const getReady = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        // const customerResponse = await axios.get(
+        //   `http://localhost:3001/api/user/${order.customer}`
+        // );
+        // const customer = customerResponse.data;
 
         // // Fetch restaurant data from Restaurant service
         // const restaurantResponse = await axios.get(
@@ -203,7 +317,7 @@ export const getReady = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          // customer,
           // restaurant,
           // items,
         };
@@ -248,10 +362,10 @@ export const getPicked = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        // const customerResponse = await axios.get(
+        //   `http://localhost:3001/api/user/${order.customer}`
+        // );
+        // const customer = customerResponse.data;
 
         // Fetch menu item data for each item
         // const items = await Promise.all(
@@ -270,7 +384,7 @@ export const getPicked = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          // customer,
           // items,
         };
       })
@@ -314,10 +428,10 @@ export const getDelivered = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
+        // const customerResponse = await axios.get(
+        //   `http://localhost:3001/api/user/${order.customer}`
+        // );
+        // const customer = customerResponse.data;
 
         // Fetch menu item data for each item
         // const items = await Promise.all(
@@ -336,7 +450,7 @@ export const getDelivered = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+          // customer,
           // items,
         };
       })
@@ -351,12 +465,10 @@ export const getDelivered = async (req, res) => {
 //Track One Specific Order (Customer)
 export const trackOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      'restaurant items.menuItem'
-    );
-    if (!order || order.customer.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Unauthorized' });
-    }
+    const order = await Order.findById(req.params.id);
+    // if (!order || order.customer.toString() !== req.user.id) {
+    //   return res.status(403).json({ message: 'Unauthorized' });
+    // }
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -366,69 +478,20 @@ export const trackOrder = async (req, res) => {
 //Customer Past Orders
 export const getOrders = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(401)
+        .json({ message: 'User not authenticated', code: 'UNAUTHENTICATED' });
+    }
+
     const orders = await Order.find({ customer: req.user.id });
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(`[SERVER_ERROR] ${err.message}`);
+    res
+      .status(500)
+      .json({ message: 'Failed to fetch orders', error: err.message });
   }
-
-  // try {
-  //   const orders = await Order.find({ customer: req.user.id });
-  //   // Enrich orders with restaurant and menu item data
-  //   const enrichedOrders = await Promise.all(
-  //     orders.map(async (order) => {
-  //       // Fetch restaurant data from Restaurant service
-  //       let restaurant;
-  //       try {
-  //         const restaurantResponse = await axios.get(
-  //           `${process.env.RESTAURANT_SERVICE_URL}/api/restaurants/${order.restaurant}`
-  //         );
-  //         restaurant = restaurantResponse.data;
-  //       } catch (err) {
-  //         restaurant = {
-  //           _id: order.restaurant,
-  //           error: 'Restaurant not found or service unavailable',
-  //         };
-  //       }
-
-  //       // Fetch menu item data for each item
-  //       const items = await Promise.all(
-  //         order.items.map(async (item) => {
-  //           try {
-  //             const menuItemResponse = await axios.get(
-  //               `${process.env.RESTAURANT_SERVICE_URL}/api/menu-items/${item.menuItem}`
-  //             );
-  //             return {
-  //               menuItem: menuItemResponse.data,
-  //               quantity: item.quantity,
-  //               price: item.price,
-  //             };
-  //           } catch (err) {
-  //             return {
-  //               menuItem: {
-  //                 _id: item.menuItem,
-  //                 error: 'Menu item not found or service unavailable',
-  //               },
-  //               quantity: item.quantity,
-  //               price: item.price,
-  //             };
-  //           }
-  //         })
-  //       );
-
-  //       // Return enriched order
-  //       return {
-  //         ...order.toObject(),
-  //         restaurant,
-  //         items,
-  //       };
-  //     })
-  //   );
-
-  //   res.json(enrichedOrders);
-  // } catch (err) {
-  //   res.status(500).json({ message: err.message });
-  // }
 };
 
 //Admin Orders
@@ -438,10 +501,6 @@ export const getAllOrders = async (req, res) => {
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         // Fetch customer data from User service
-        const customerResponse = await axios.get(
-          `http://localhost:3001/api/user/${order.customer}`
-        );
-        const customer = customerResponse.data;
 
         // // Fetch restaurant data from Restaurant service
         // const restaurantResponse = await axios.get(
@@ -466,7 +525,7 @@ export const getAllOrders = async (req, res) => {
         // Return enriched order
         return {
           ...order.toObject(),
-          customer,
+
           // restaurant,
           // items,
         };

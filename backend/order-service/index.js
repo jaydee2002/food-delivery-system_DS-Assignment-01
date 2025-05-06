@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { Server } from 'socket.io';
 import http from 'http';
+import cors from 'cors';
 
 import orderRoutes from './routes/orderRoutes.js';
 
@@ -12,6 +13,12 @@ const app = express();
 const server = http.createServer(app);
 export const io = new Server(server);
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+);
 
 mongoose
   .connect(process.env.MONGO_URI)

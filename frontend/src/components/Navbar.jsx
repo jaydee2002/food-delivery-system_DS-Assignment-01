@@ -185,6 +185,7 @@ export default function Navbar() {
         </button>
 
         {/* Desktop Menu */}
+
         <div className="hidden md:flex items-center space-x-6">
           {menuItems.map((item) =>
             item.isDropdown ? (

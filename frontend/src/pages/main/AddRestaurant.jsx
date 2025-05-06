@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { createRestaurant } from "../../services/restaurentServices"; // Import the service
 
-export default function RestaurantSignupForm() {
+export default function AddRestaurant() {
   // Country data with flags, names and phone codes
   const countries = [
     { code: "LK", name: "Sri Lanka", dial_code: "+94", flag: "🇱🇰" },
